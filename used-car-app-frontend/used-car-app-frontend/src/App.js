@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './components/Login';
 import Register from './components/Register';
 import Home from './components/Home';
+import LoanCalcualtor from './components/LoanCalculator';
 import UserProfile from './components/UserProfile';
 import SellerDashboard from './components/SellerDashboard'; // Import the new component
 import PrivateRoute from './components/PrivateRoute'; // Import the PrivateRoute component
@@ -15,6 +16,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/home" element={<Home />} />
+                <Route path="/loancalculator" element={<LoanCalcualtor />} />
                 
                 {/* Protecting the Seller Dashboard route */}
                 <Route 

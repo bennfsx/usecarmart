@@ -22,6 +22,7 @@ const Header = () => {
                     <li><a href="/profile" className="hover:text-indigo-600">My Account</a></li>
                     <li><a href="/about" className="hover:text-indigo-600">About Us</a></li>
                     <li><a href="/contact" className="hover:text-indigo-600">Contact</a></li>
+                    <li><a href="/loancalculator" className="hover:text-indigo-600">Loan Calculator</a></li> {/* New link to Loan Calculator */}
                     {isLoggedIn ? (
                         <li>
                             <button 
