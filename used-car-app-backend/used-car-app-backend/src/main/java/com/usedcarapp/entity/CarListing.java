@@ -20,7 +20,7 @@ public class CarListing {
     private String description;
     private Double price;
     private Long sellerId; // Optional: Include if you have a sellerId field
-    private Long views; // Add the views field
+    private int views; // Add the views field
 
     // Constructor to create a CarListing from CarListingDTO
     public CarListing(CarListingDTO carListingDTO) {
@@ -32,11 +32,11 @@ public class CarListing {
     }
 
     // Getter and Setter for views
-    public Long getViews() {
+    public int getViews() {
         return views;
     }
 
-    public void setViews(Long views) {
+    public void setViews(int views) {
         this.views = views;
     }
 }

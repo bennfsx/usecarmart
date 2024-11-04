@@ -18,9 +18,10 @@ const Login = () => {
 
             // Adjust the response based on your backend implementation
             // Assuming your backend sends a token as { token: "your_token_here" }
-            const token = response.data.token; // Adjust this line if your structure is different
+            console.log('Response data:', response.data);
+            const token = response.data; // Use this if response.data is the token string
             localStorage.setItem('token', token); // Store the token in local storage
-
+            
             alert('Login successful! Redirecting to home...');
             navigate('/home'); // Redirect to home page after successful login
         } catch (error) {

@@ -28,7 +28,7 @@ public class CarListingService {
     public void incrementViews(Long id) {
         CarListing carListing = carListingRepository.findById(id).orElse(null);
         if (carListing != null) {
-            carListing.setViews(carListing.getViews() == null ? 1 : carListing.getViews() + 1);
+            carListing.setViews(carListing.getViews() == 0 ? 1 : carListing.getViews() + 1);
             carListingRepository.save(carListing);
         }
     }
