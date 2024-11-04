@@ -44,6 +44,7 @@ public class UserService {
 
     private String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
         claims.put("role", user.getRole());
         claims.put("name", user.getName()); // Add name
         claims.put("phoneNumber", user.getPhoneNumber()); // Add phone number
@@ -65,7 +66,7 @@ public class UserService {
     public UserProfileDTO getUserProfile(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return new UserProfileDTO(user.getEmail(), user.getName(), user.getRole(), user.getPhoneNumber(), user.getAddress());
+        return new UserProfileDTO(user.getEmail(), user.getName(), user.getRole(), user.getPhoneNumber(), user.getAddress(), user.getId());
     }
 
     public void updateUserProfile(String email, UserProfileDTO userProfileDTO) {

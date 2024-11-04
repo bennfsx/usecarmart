@@ -1,42 +1,77 @@
 package com.usedcarapp.entity;
 
-import com.usedcarapp.dto.CarListingDTO; // Ensure this import is added
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Table(name = "car_listings")
 public class CarListing {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long sellerId; // Assuming this is the ID of the seller
+
     private String title;
     private String description;
     private Double price;
-    private Long sellerId; // Optional: Include if you have a sellerId field
-    private int views; // Add the views field
+    private String imageUrl;
+    private Integer views;
 
-    // Constructor to create a CarListing from CarListingDTO
-    public CarListing(CarListingDTO carListingDTO) {
-        this.title = carListingDTO.getTitle();
-        this.description = carListingDTO.getDescription();
-        this.price = carListingDTO.getPrice();
-        this.sellerId = carListingDTO.getSellerId(); // Add this if you have a sellerId field
-        this.views = carListingDTO.getViews(); // Initialize views
+    // Getters and Setters
+    public Long getId() {
+        return id;
     }
 
-    // Getter and Setter for views
-    public int getViews() {
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(Long sellerId) {
+        this.sellerId = sellerId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public Integer getViews() {
         return views;
     }
 
-    public void setViews(int views) {
+    public void setViews(Integer views) {
         this.views = views;
     }
 }

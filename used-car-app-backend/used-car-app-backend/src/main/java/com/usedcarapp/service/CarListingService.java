@@ -1,23 +1,29 @@
-// src/main/java/com/usedcarapp/service/CarListingService.java
+// CarListingService.java
 package com.usedcarapp.service;
 
 import com.usedcarapp.dto.CarListingDTO;
 import com.usedcarapp.entity.CarListing;
 import com.usedcarapp.repository.CarListingRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class CarListingService {
-
     @Autowired
     private CarListingRepository carListingRepository;
 
     public CarListing createListing(CarListingDTO carListingDTO) {
-        CarListing carListing = new CarListing(carListingDTO);
+        CarListing carListing = new CarListing();
+        carListing.setSellerId(carListingDTO.getSellerId());
+        carListing.setTitle(carListingDTO.getTitle());
+        carListing.setDescription(carListingDTO.getDescription());
+        carListing.setPrice(carListingDTO.getPrice());
+        carListing.setImageUrl(carListingDTO.getImageUrl());
+        carListing.setViews(0); // Initialize views to zero
         return carListingRepository.save(carListing);
     }
 
@@ -26,16 +32,15 @@ public class CarListingService {
     }
 
     public void incrementViews(Long id) {
-        CarListing carListing = carListingRepository.findById(id).orElse(null);
+        CarListing carListing = getListingDetails(id);
         if (carListing != null) {
-            carListing.setViews(carListing.getViews() == 0 ? 1 : carListing.getViews() + 1);
+            carListing.setViews(carListing.getViews() + 1);
             carListingRepository.save(carListing);
         }
     }
-    
-    
 
-    public List<CarListing> getSellerListings(Long sellerId) {
-        return carListingRepository.findBySellerId(sellerId);
+    public List<CarListing> getSellerListings(Long sellerId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return carListingRepository.findBySellerId(sellerId, pageable).getContent();
     }
 }

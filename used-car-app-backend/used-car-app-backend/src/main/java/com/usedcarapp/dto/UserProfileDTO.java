@@ -8,19 +8,29 @@ public class UserProfileDTO {
     private Role role; // Optional: add role if relevant to the profile
     private String phoneNumber; // Optional: add phone number
     private String address; // Optional: add address
+    private Long id;
 
     // Constructors, Getters and Setters
 
     public UserProfileDTO() {
     }
 
-    public UserProfileDTO(String email, String name, Role role, String phoneNumber, String address) {
+    public UserProfileDTO(String email, String name, Role role, String phoneNumber, String address, Long id) {
         this.email = email;
         this.name = name;
         this.role = role;
         this.phoneNumber = phoneNumber;
         this.address = address;
+        this.id = id;
     }
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
 
     public String getEmail() {
         return email;
