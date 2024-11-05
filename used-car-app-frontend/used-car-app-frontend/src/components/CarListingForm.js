@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 const CarListingForm = () => {
     const [carDetails, setCarDetails] = useState({
@@ -20,23 +21,26 @@ const CarListingForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const token = localStorage.getItem('token'); // Retrieve token
+        const token = localStorage.getItem('token');
 
         if (!token) {
             alert('Please log in to list a car.');
             return;
         }
 
+        // Decode the token to extract the user ID
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.id; // Assumes 'id' is in the payload
+
+        const listingData = { ...carDetails, sellerId: userId };
+
         try {
-            const userId = localStorage.getItem('userId'); // Assuming you have the user ID stored in local storage
-            const listingData = { ...carDetails, sellerId: userId }; // Include sellerId
-            console.log("all items", localStorage)
             const response = await axios.post('http://localhost:8080/listings/create', listingData, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            if (response.status === 201) {
+            if (response.status === 200) {
                 alert('Car listed successfully!');
-                navigate('/my-listings'); // Redirect to seller's listings page
+                navigate('/home'); // Redirect to home page after successful listing
             }
         } catch (error) {
             console.error('Error listing car:', error);

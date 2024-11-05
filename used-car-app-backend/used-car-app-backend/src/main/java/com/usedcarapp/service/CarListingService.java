@@ -43,4 +43,8 @@ public class CarListingService {
         Pageable pageable = PageRequest.of(page, size);
         return carListingRepository.findBySellerId(sellerId, pageable).getContent();
     }
+
+    public List<CarListing> getAllListings() {
+        return carListingRepository.findAll(); // Assuming you have a repository method for this
+    }
 }

@@ -30,6 +30,12 @@ public class CarListingController {
         carListingService.incrementViews(id);
     }
 
+    // New endpoint to get all listings
+    @GetMapping
+    public List<CarListing> getAllListings() {
+        return carListingService.getAllListings(); // Implement this method in your service
+    }
+
     @GetMapping("/seller/{sellerId}")
     public List<CarListing> getSellerListings(@PathVariable Long sellerId,
                                               @RequestParam(defaultValue = "0") int page,
