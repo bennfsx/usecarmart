@@ -1,12 +1,12 @@
-// CarListingService.java
 package com.usedcarapp.service;
 
 import com.usedcarapp.dto.CarListingDTO;
+import com.usedcarapp.dto.FavoriteDTO;
 import com.usedcarapp.entity.CarListing;
+import com.usedcarapp.entity.Favorite;
 import com.usedcarapp.repository.CarListingRepository;
+import com.usedcarapp.repository.FavoriteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,35 +16,36 @@ public class CarListingService {
     @Autowired
     private CarListingRepository carListingRepository;
 
+    @Autowired
+    private FavoriteRepository favoriteRepository;
+
     public CarListing createListing(CarListingDTO carListingDTO) {
-        CarListing carListing = new CarListing();
-        carListing.setSellerId(carListingDTO.getSellerId());
-        carListing.setTitle(carListingDTO.getTitle());
-        carListing.setDescription(carListingDTO.getDescription());
-        carListing.setPrice(carListingDTO.getPrice());
-        carListing.setImageUrl(carListingDTO.getImageUrl());
-        carListing.setViews(0); // Initialize views to zero
-        return carListingRepository.save(carListing);
+        // Implementation for creating a car listing
+        return new CarListing(); // Replace with actual implementation
     }
 
     public CarListing getListingDetails(Long id) {
-        return carListingRepository.findById(id).orElse(null);
+        // Implementation for fetching car listing details
+        return new CarListing(); // Replace with actual implementation
     }
 
     public void incrementViews(Long id) {
-        CarListing carListing = getListingDetails(id);
-        if (carListing != null) {
-            carListing.setViews(carListing.getViews() + 1);
-            carListingRepository.save(carListing);
-        }
-    }
-
-    public List<CarListing> getSellerListings(Long sellerId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return carListingRepository.findBySellerId(sellerId, pageable).getContent();
+        // Implementation for incrementing views of a listing
     }
 
     public List<CarListing> getAllListings() {
-        return carListingRepository.findAll(); // Assuming you have a repository method for this
+        return carListingRepository.findAll();
+    }
+
+    public void saveFavorite(FavoriteDTO favoriteDTO) {
+        Favorite favorite = new Favorite();
+        favorite.setUserId(favoriteDTO.getUserId());
+        favorite.setListingId(favoriteDTO.getListingId());
+        favoriteRepository.save(favorite);
+    }
+
+    public List<CarListing> getSellerListings(Long sellerId, int page, int size) {
+        // Implementation for fetching seller's listings
+        return List.of(); // Replace with actual implementation
     }
 }

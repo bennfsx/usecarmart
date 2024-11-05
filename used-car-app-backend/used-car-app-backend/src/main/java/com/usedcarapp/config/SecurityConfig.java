@@ -25,7 +25,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // Disable CSRF for testing; re-enable for production
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/test", "/users/register", "/users/login", "/api/loan/calculate", "/users/profile","/listings").permitAll() // Allow access without authentication
+                .requestMatchers("/test", "/users/register", "/users/login", "/api/loan/calculate", "/users/profile","/listings", "/favorites/*", "/favorites"  ).permitAll() // Allow access without authentication
                 .anyRequest().authenticated() // Require authentication for other endpoints
             )
             .formLogin(form -> form.disable()) // Disable the default form login

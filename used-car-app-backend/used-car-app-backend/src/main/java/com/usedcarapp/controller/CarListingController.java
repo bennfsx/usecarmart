@@ -1,7 +1,7 @@
-// CarListingController.java
 package com.usedcarapp.controller;
 
 import com.usedcarapp.dto.CarListingDTO;
+import com.usedcarapp.dto.FavoriteDTO;
 import com.usedcarapp.entity.CarListing;
 import com.usedcarapp.service.CarListingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +30,14 @@ public class CarListingController {
         carListingService.incrementViews(id);
     }
 
-    // New endpoint to get all listings
     @GetMapping
     public List<CarListing> getAllListings() {
-        return carListingService.getAllListings(); // Implement this method in your service
+        return carListingService.getAllListings();
+    }
+
+    @PostMapping("/favorites")
+    public void saveFavoriteListing(@RequestBody FavoriteDTO favoriteDTO) {
+        carListingService.saveFavorite(favoriteDTO);
     }
 
     @GetMapping("/seller/{sellerId}")
