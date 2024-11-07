@@ -21,7 +21,7 @@ const Login = () => {
             console.log('Response data:', response.data);
             const token = response.data; // Use this if response.data is the token string
             localStorage.setItem('token', token); // Store the token in local storage
-            
+
             alert('Login successful! Redirecting to home...');
             navigate('/home'); // Redirect to home page after successful login
         } catch (error) {
