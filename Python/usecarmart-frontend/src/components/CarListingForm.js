@@ -31,7 +31,7 @@ const CarListingForm = () => {
     if (carId) {
       setIsEdit(true); // Set to edit mode if carId is provided in the URL
       axios
-        .get(`http://localhost:5000/car-listings/${carId}`)
+        .get(`http://localhost:8000/car-listings/${carId}`)
         .then((response) => {
           if (response.status === 200) {
             const { description, price, title, image_url, seller_id } = response.data;
@@ -77,10 +77,10 @@ const CarListingForm = () => {
       let response;
       if (isEdit) {
         // Update existing car listing
-        response = await axios.put(`http://localhost:5000/car-listings/${carId}`, carData);
+        response = await axios.put(`http://localhost:8000/car-listings/${carId}`, carData);
       } else {
         // Create new car listing
-        response = await axios.post('http://localhost:5000/list-car', carData);
+        response = await axios.post('http://localhost:8000/list-car', carData);
       }
 
       if (response.status === 200 || response.status === 201) {

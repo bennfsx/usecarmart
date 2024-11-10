@@ -13,7 +13,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://127.0.0.1:5000/register', { email, password, role });
+      await axios.post('http://127.0.0.1:8000/register', { email, password, role });
 
       // Display success message and redirect to login after 2 seconds
       setSuccessMessage('Registration successful! Redirecting to login...');

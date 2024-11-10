@@ -10,7 +10,7 @@ const Home = () => {
 
   const fetchCarListings = async (page) => {
     try {
-      const response = await axios.get(`http://localhost:5000/car-listings?page=${page}&limit=8`);
+      const response = await axios.get(`http://localhost:8000/car-listings?page=${page}&limit=8`);
       setCarListings(response.data.listings);
       setTotalPages(response.data.totalPages);
     } catch (error) {

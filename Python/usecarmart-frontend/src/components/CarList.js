@@ -10,7 +10,7 @@ const CarListings = () => {
   useEffect(() => {
     const fetchCarListings = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/car-listings', {
+        const response = await axios.get('http://localhost:8000/car-listings', {
             params: {
               page: pagination.page,
               limit: 5,
