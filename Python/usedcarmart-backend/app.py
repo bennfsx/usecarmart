@@ -20,7 +20,7 @@ JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
 app = Flask(__name__)
 
 # Enable CORS for all routes, allowing requests from localhost:3000
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 # Connect to Supabase
@@ -110,6 +110,17 @@ def logout():
 
 
 app.register_blueprint(car_blueprint)
+
+
+@app.before_request
+def handle_preflight():
+    if request.method == 'OPTIONS':
+        response = jsonify({"message": "OK"})
+        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+        response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        return response
+
 
 if __name__ == '__main__':
     app.run(debug=True)

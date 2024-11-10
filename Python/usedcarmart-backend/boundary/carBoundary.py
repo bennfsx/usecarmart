@@ -74,17 +74,25 @@ def car_listing(car_id):
         return jsonify({"message": "Car listing not found"}), 404
 
     elif request.method == 'PUT':
-        # Ensure only the seller can update their own listing
-        data = request.get_json()
-        seller_id = data.get('seller_id')  # ID of the user making the request
-
+        # Get the car listing by ID
         car_listing = get_car_by_id(car_id)
-        if not car_listing or car_listing['seller_id'] != seller_id:
-            return jsonify({"message": "Unauthorized or listing not found"}), 403
+        if not car_listing:
+            return jsonify({"message": "Car listing not found"}), 404
 
-        # Perform the update
-        updated_listing = update_single_car_listing(car_id, data)
+        # Get the data from the request body
+        data = request.get_json()
+
+        # Extract the seller_id from the data
+        seller_id = data.get('seller_id')  # Make sure seller_id is passed in the request body
+
+        # Ensure that the logged-in seller can only edit their own listing
+        if car_listing['seller_id'] != seller_id:
+            return jsonify({"message": "Unauthorized to edit this listing"}), 403
+
+        # Now call the update function with car_id, seller_id, and data
+        updated_listing = update_single_car_listing(car_id, seller_id, data)
+
         if updated_listing:
             return jsonify({"message": "Listing updated successfully", "car": updated_listing}), 200
         return jsonify({"message": "Failed to update listing"}), 500
-    
+
