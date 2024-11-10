@@ -1,31 +1,31 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import axios from 'axios';
 
 const Home = () => {
   const [carListings, setCarListings] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const navigate = useNavigate(); // Initialize navigate
 
-  // Function to fetch car listings and update state
   const fetchCarListings = async (page) => {
     try {
-      // Update this URL to match your backend's port
-      const response = await axios.get(`http://localhost:5000/car-listings?page=${page}&limit=5`);
-      console.log(response.data); // Log the full response for debugging
-      setCarListings(response.data.listings); // Ensure this is an array
-      setTotalPages(response.data.totalPages); // Set total pages from the backend
+      const response = await axios.get(`http://localhost:5000/car-listings?page=${page}&limit=8`);
+      setCarListings(response.data.listings);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error fetching car listings:", error);
     }
   };
-  
 
-  // Fetch car listings on page load or when the current page changes
   useEffect(() => {
     fetchCarListings(currentPage);
   }, [currentPage]);
 
-  // Handle pagination logic
+  const handleListingClick = (carId) => {
+    navigate(`/car-listing/${carId}`); // Navigate to individual listing page
+  };
+
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
@@ -36,11 +36,14 @@ const Home = () => {
     <div className="container mx-auto p-6">
       <h2 className="text-3xl font-semibold text-center mb-6">Explore Our Car Listings</h2>
 
-      {/* Car Listings Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {Array.isArray(carListings) && carListings.length > 0 ? (
           carListings.map((car) => (
-            <div key={car.id} className="border border-gray-300 rounded-lg shadow-lg overflow-hidden">
+            <div
+              key={car.id}
+              className="border border-gray-300 rounded-lg shadow-lg overflow-hidden cursor-pointer"
+              onClick={() => handleListingClick(car.id)} // Add click handler
+            >
               <img
                 src={car.image_url}
                 alt={car.title}
@@ -58,7 +61,6 @@ const Home = () => {
         )}
       </div>
 
-      {/* Pagination Controls */}
       <div className="flex justify-center items-center mt-6 space-x-4">
         <button
           onClick={() => handlePageChange(currentPage - 1)}

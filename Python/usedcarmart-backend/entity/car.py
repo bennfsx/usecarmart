@@ -98,3 +98,26 @@ def get_car_listings(page, limit):
     except Exception as e:
         print(f"Error fetching car listings: {e}")
         return None, 0
+    
+
+def get_car_by_id(car_id):
+    """
+    Fetches a car listing by its ID.
+    """
+    try:
+        response = supabase.table('car_listings').select('*').eq('id', car_id).single().execute()
+        return response.data if response.data else None
+    except Exception as e:
+        print(f"Error fetching car by ID: {e}")
+        return None
+
+def update_car(car_id, data):
+    """
+    Updates an existing car listing if it exists.
+    """
+    try:
+        response = supabase.table('car_listings').update(data).eq('id', car_id).execute()
+        return response.data[0] if response.data else None
+    except Exception as e:
+        print(f"Error updating car listing: {e}")
+        return None

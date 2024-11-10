@@ -1,6 +1,6 @@
 from entity.user import create_user, verify_user
 from utils.jwt_utils import generate_token
-from entity.car import create_car, get_car_by_id, update_car_interests, get_car_listings
+from entity.car import create_car, get_car_by_id, update_car_interests, get_car_listings, update_car, get_car_by_id
 
 
 # --- User Registration and Login Logic ---
@@ -76,3 +76,31 @@ def handle_get_car_listings(page, limit, search_query, min_price, max_price, sor
         "listings": listings,
         "total_pages": total_pages
     }
+
+def fetch_single_car_listing(car_id):
+    """
+    Retrieves a car listing by ID.
+    """
+    car_listing = get_car_by_id(car_id)
+    if car_listing:
+        return car_listing
+    return {"message": "Car listing not found"}, 404
+
+def update_single_car_listing(car_id, data, seller_id):
+    """
+    Updates a car listing if the requester is the owner.
+    """
+    car_listing = get_car_by_id(car_id)
+    if not car_listing:
+        return {"message": "Car listing not found"}, 404
+
+    # Check if the requester is the owner
+    if car_listing['seller_id'] != seller_id:
+        return {"message": "Unauthorized: Only the owner can update this listing"}, 403
+
+    # Perform the update
+    updated_listing = update_car(car_id, data)
+    if updated_listing:
+        return {"message": "Listing updated successfully", "car": updated_listing}, 200
+    return {"message": "Failed to update listing"}, 500
+
