@@ -1,6 +1,13 @@
 from flask import Blueprint, request, jsonify
-from controller.controller import create_car, get_car_by_id, update_car_interests, get_car_listings, fetch_single_car_listing, update_single_car_listing, increment_views
-
+from controller.controller import (
+    create_car, 
+    get_car_by_id, 
+    update_car_interests, 
+    get_car_listings, 
+    update_single_car_listing, 
+    increment_views, 
+    delete_car_listing
+)
 
 # Create a Blueprint instance for car-related routes
 car_blueprint = Blueprint('car', __name__)
@@ -45,7 +52,7 @@ def update_car_interests_route(car_id):
 @car_blueprint.route('/car-listings', methods=['GET'])
 def get_paginated_car_listings():
     try:
-        # Get pagination parameters from query string, default to page 1 and limit 5
+        # Get pagination parameters from query string, default to page 1 and limit 8
         page = int(request.args.get('page', 1))
         limit = int(request.args.get('limit', 8))
 
@@ -63,8 +70,7 @@ def get_paginated_car_listings():
         print(f"Error fetching car listings: {e}")
         return jsonify({"message": "Error fetching car listings"}), 500
 
-
-@car_blueprint.route('/car-listings/<int:car_id>', methods=['GET', 'PUT'])
+@car_blueprint.route('/car-listings/<int:car_id>', methods=['GET', 'PUT', 'DELETE'])
 def car_listing(car_id):
     if request.method == 'GET':
         # Increment the views count every time the car listing is viewed
@@ -98,3 +104,23 @@ def car_listing(car_id):
         if updated_listing:
             return jsonify({"message": "Listing updated successfully", "car": updated_listing}), 200
         return jsonify({"message": "Failed to update listing"}), 500
+
+    elif request.method == 'DELETE':
+        # Get the car listing by ID
+        car_listing = get_car_by_id(car_id)
+        if not car_listing:
+            return jsonify({"message": "Car listing not found"}), 404
+
+        # Extract the seller_id from the request body
+        seller_id = request.get_json().get('seller_id')  # Ensure seller_id is passed in the request body
+
+        # Ensure that the logged-in seller can only delete their own listing
+        if car_listing['seller_id'] != seller_id:
+            return jsonify({"message": "Unauthorized to delete this listing"}), 403
+
+        # Now call the delete function with both car_id and seller_id
+        delete_success = delete_car_listing(car_id, seller_id)  # Pass both car_id and seller_id
+
+        if delete_success:
+            return jsonify({"message": "Listing deleted successfully"}), 200
+        return jsonify({"message": "Failed to delete listing"}), 500

@@ -147,3 +147,27 @@ def increment_views(car_id):
         
     except Exception as e:
         print(f"Error updating views for car listing {car_id}: {e}")
+
+def delete_car_listing_from_db(car_id, seller_id):
+    """
+    Deletes the car listing from the database if the seller is the owner.
+    """
+    try:
+        # Fetch the car listing by ID
+        car_listing = get_car_by_id(car_id)
+        if not car_listing:
+            return False  # Car not found
+
+        if car_listing['seller_id'] != seller_id:
+            return False  # Seller is not the owner, cannot delete
+
+        # Perform the deletion of the car listing from the database
+        response = supabase.table('car_listings').delete().eq('id', car_id).execute()
+
+        # Check if the deletion was successful
+        if response.data:
+            return True
+        return False
+    except Exception as e:
+        print(f"Error deleting car listing: {e}")
+        return False

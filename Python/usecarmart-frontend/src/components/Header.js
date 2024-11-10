@@ -35,6 +35,10 @@ const Header = () => {
           <li>
             <Link to="/" className="text-white">Home</Link>
           </li>
+          {/* Add Loan Calculator link */}
+          <li>
+            <Link to="/loan-calculator" className="text-white">Loan Calculator</Link>
+          </li>
           {isLoggedIn ? (
             <>
               {isSeller && (

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode'; // Import jwtDecode
+import { jwtDecode } from 'jwt-decode'; // Correct import
 
 const IndividualCarListing = () => {
   const { id } = useParams();
@@ -20,7 +20,7 @@ const IndividualCarListing = () => {
     if (id && !car) { // Check if id exists and car is not yet fetched
       const fetchCarListing = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/car-listings/${id}`);
+          const response = await axios.get(`http://localhost:8000/car-listings/${id}`);
           const listing = response.data;
   
           console.log('Fetched car listing:', listing);
@@ -48,7 +48,6 @@ const IndividualCarListing = () => {
       fetchCarListing();
     }
   }, [id]);  // Only depend on `id`, not `car`
-  
 
   const handleEditToggle = () => setEditable(!editable);
 
@@ -63,7 +62,7 @@ const IndividualCarListing = () => {
       const sellerId = decodedToken.id; // Get the seller ID from the token
   
       const response = await axios.put(
-        `http://localhost:5000/car-listings/${id}`,
+        `http://localhost:8000/car-listings/${id}`,
         { ...formData, seller_id: sellerId }, // Send the seller_id along with the form data
         {
           headers: {
@@ -79,6 +78,38 @@ const IndividualCarListing = () => {
       alert('Failed to update the listing.');
     }
   };
+
+  const handleDelete = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const decodedToken = jwtDecode(token); // Decode the token to get the user ID
+      const sellerId = decodedToken.id; // Get the seller ID from the token
+  
+      // Check if the logged-in user is the owner before deleting
+      if (car.seller_id !== sellerId) {
+        alert('You are not authorized to delete this listing');
+        return;
+      }
+  
+      const response = await axios.delete(`http://localhost:8000/car-listings/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Send the token in the request headers
+          // Do not include Content-Type for DELETE requests
+        },
+      });
+  
+      if (response.status === 200) {
+        alert('Listing deleted successfully!');
+        navigate('/'); // Redirect to homepage or list of car listings after deletion
+      }
+    } catch (error) {
+      console.error('Error deleting car listing:', error);
+      alert('Failed to delete the listing.');
+    }
+  };
+  
+  
+  
   
 
   if (!car) return <p>Loading...</p>;
@@ -138,12 +169,20 @@ const IndividualCarListing = () => {
             )}
             <p className="text-sm text-gray-600 mt-2">Views: {car.views}</p>
             {isOwner && (
-              <button
-                onClick={handleEditToggle}
-                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-all"
-              >
-                Edit
-              </button>
+              <div>
+                <button
+                  onClick={handleEditToggle}
+                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-all"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="mt-4 ml-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-all"
+                >
+                  Delete
+                </button>
+              </div>
             )}
           </div>
         )}

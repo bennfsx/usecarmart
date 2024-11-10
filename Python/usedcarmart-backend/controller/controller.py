@@ -1,6 +1,6 @@
 from entity.user import create_user, verify_user
 from utils.jwt_utils import generate_token
-from entity.car import create_car, get_car_by_id, update_car_interests, get_car_listings, update_car, get_car_by_id, increment_views
+from entity.car import create_car, get_car_by_id, update_car_interests, get_car_listings, update_car, get_car_by_id, increment_views, delete_car_listing_from_db
 
 
 # --- User Registration and Login Logic ---
@@ -110,3 +110,24 @@ def update_single_car_listing(car_id, data, seller_id):
     if updated_listing:
         return {"message": "Listing updated successfully", "car": updated_listing}, 200
     return {"message": "Failed to update listing"}, 500
+
+def delete_car_listing(car_id, seller_id):
+    """
+    Deletes a car listing from the database if the seller is the owner.
+    """
+    # Call the function that handles the actual deletion logic
+    success = delete_car_listing_from_db(car_id, seller_id)
+    return success
+
+
+def calculate_monthly_payment(price, down_payment, interest_rate, loan_term_years):
+    loan_amount = price - down_payment
+    monthly_rate = (interest_rate / 100) / 12
+    total_payments = loan_term_years * 12
+
+    if monthly_rate == 0:  # No interest case
+        return loan_amount / total_payments
+
+    # Standard formula for monthly payment
+    monthly_payment = loan_amount * (monthly_rate * (1 + monthly_rate) ** total_payments) / ((1 + monthly_rate) ** total_payments - 1)
+    return monthly_payment

@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS  # Import CORS
 from boundary.carBoundary import car_blueprint  # Import the car blueprint
+from boundary.loanBoundary import loan_blueprint
 
 # Load environment variables
 load_dotenv()
@@ -110,7 +111,7 @@ def logout():
 
 
 app.register_blueprint(car_blueprint)
-
+app.register_blueprint(loan_blueprint, url_prefix='/')
 
 @app.before_request
 def handle_preflight():
@@ -123,4 +124,4 @@ def handle_preflight():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=8000)
