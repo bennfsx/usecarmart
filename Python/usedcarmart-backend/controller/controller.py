@@ -1,6 +1,6 @@
 from entity.user import create_user, verify_user
 from utils.jwt_utils import generate_token
-from entity.car import create_car, get_car_by_id, update_car_interests, get_car_listings, update_car, get_car_by_id
+from entity.car import create_car, get_car_by_id, update_car_interests, get_car_listings, update_car, get_car_by_id, increment_views
 
 
 # --- User Registration and Login Logic ---
@@ -49,7 +49,11 @@ def handle_list_car(car_data):
 def get_car_listing(car_id):
     """
     Handles fetching car listing details by ID.
+    This function increments the views count before fetching the car details.
     """
+    # Increment the views count before fetching car details
+    increment_views(car_id)
+
     car = get_car_by_id(car_id)
     if car:
         return {"car": car}
@@ -81,6 +85,9 @@ def fetch_single_car_listing(car_id):
     """
     Retrieves a car listing by ID.
     """
+    # Increment the views count before returning the car listing
+    increment_views(car_id)
+
     car_listing = get_car_by_id(car_id)
     if car_listing:
         return car_listing
@@ -103,4 +110,3 @@ def update_single_car_listing(car_id, data, seller_id):
     if updated_listing:
         return {"message": "Listing updated successfully", "car": updated_listing}, 200
     return {"message": "Failed to update listing"}, 500
-

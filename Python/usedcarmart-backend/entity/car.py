@@ -122,5 +122,28 @@ def update_car(car_id, data):
         print(f"Error updating car listing: {e}")
         return None
     
+def increment_views(car_id):
+    """
+    Increments the view count for the given car listing.
+    """
+    try:
+        # Get the current views count first
+        car_listing = supabase.table('car_listings').select('views').eq('id', car_id).execute()
 
-    
+        if car_listing.data:
+            # Get current views value
+            current_views = car_listing.data[0]['views']
+            
+            # Update views by incrementing
+            response = supabase.table('car_listings').update({'views': current_views + 1}).eq('id', car_id).execute()
+
+            # Check the response
+            if response.data:
+                print(f"Successfully updated views for car listing {car_id}")
+            else:
+                print(f"Failed to update views for car listing {car_id}")
+        else:
+            print(f"Car listing with ID {car_id} not found.")
+        
+    except Exception as e:
+        print(f"Error updating views for car listing {car_id}: {e}")

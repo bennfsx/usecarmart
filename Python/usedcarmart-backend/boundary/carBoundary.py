@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from controller.controller import create_car, get_car_by_id, update_car_interests, get_car_listings, fetch_single_car_listing, update_single_car_listing
+from controller.controller import create_car, get_car_by_id, update_car_interests, get_car_listings, fetch_single_car_listing, update_single_car_listing, increment_views
 
 
 # Create a Blueprint instance for car-related routes
@@ -67,7 +67,10 @@ def get_paginated_car_listings():
 @car_blueprint.route('/car-listings/<int:car_id>', methods=['GET', 'PUT'])
 def car_listing(car_id):
     if request.method == 'GET':
-        # Fetch individual listing by ID
+        # Increment the views count every time the car listing is viewed
+        increment_views(car_id)
+
+        # Fetch the updated car listing by ID
         car_listing = get_car_by_id(car_id)
         if car_listing:
             return jsonify(car_listing), 200
@@ -83,7 +86,7 @@ def car_listing(car_id):
         data = request.get_json()
 
         # Extract the seller_id from the data
-        seller_id = data.get('seller_id')  # Make sure seller_id is passed in the request body
+        seller_id = data.get('seller_id')  # Ensure seller_id is passed in the request body
 
         # Ensure that the logged-in seller can only edit their own listing
         if car_listing['seller_id'] != seller_id:
@@ -95,4 +98,3 @@ def car_listing(car_id):
         if updated_listing:
             return jsonify({"message": "Listing updated successfully", "car": updated_listing}), 200
         return jsonify({"message": "Failed to update listing"}), 500
-

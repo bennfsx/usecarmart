@@ -17,35 +17,38 @@ const IndividualCarListing = () => {
   });
 
   useEffect(() => {
-    const fetchCarListing = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/car-listings/${id}`);
-        const listing = response.data;
-
-        console.log('Fetched car listing:', listing);
-        setCar(listing);
-        setFormData({
-          title: listing.title,
-          description: listing.description,
-          price: listing.price,
-          image_url: listing.image_url,
-        });
-
-        // Decode the JWT token to get the logged-in user's ID
-        const token = localStorage.getItem('token');
-        if (token) {
-          const decodedToken = jwtDecode(token);
-          const userId = decodedToken.id; // Assuming the token contains the 'id' field
-          setIsOwner(listing.seller_id === userId); // Compare seller_id with logged-in user's ID
-          console.log('Logged-in user ID:', userId);
+    if (id && !car) { // Check if id exists and car is not yet fetched
+      const fetchCarListing = async () => {
+        try {
+          const response = await axios.get(`http://localhost:5000/car-listings/${id}`);
+          const listing = response.data;
+  
+          console.log('Fetched car listing:', listing);
+          setCar(listing);
+          setFormData({
+            title: listing.title,
+            description: listing.description,
+            price: listing.price,
+            image_url: listing.image_url,
+          });
+  
+          // Decode the JWT token to get the logged-in user's ID
+          const token = localStorage.getItem('token');
+          if (token) {
+            const decodedToken = jwtDecode(token);
+            const userId = decodedToken.id; // Assuming the token contains the 'id' field
+            setIsOwner(listing.seller_id === userId); // Compare seller_id with logged-in user's ID
+            console.log('Logged-in user ID:', userId);
+          }
+        } catch (error) {
+          console.error('Error fetching car listing:', error);
         }
-      } catch (error) {
-        console.error('Error fetching car listing:', error);
-      }
-    };
-
-    fetchCarListing();
-  }, [id]);
+      };
+  
+      fetchCarListing();
+    }
+  }, [id]);  // Only depend on `id`, not `car`
+  
 
   const handleEditToggle = () => setEditable(!editable);
 
