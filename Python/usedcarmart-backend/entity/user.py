@@ -42,3 +42,10 @@ def update_user_profile(user_id, profile_data):
     
     # If no error, return the updated data
     return response.data[0] if response.data else None
+
+# Update user's password
+def update_user_password(user_id, new_password_hash):
+    response = supabase.table("users").update({"password": new_password_hash}).eq("id", user_id).execute()
+    if response.status_code == 200 and response.data:
+        return True
+    return False

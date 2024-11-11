@@ -1,6 +1,7 @@
-from entity.user import create_user, verify_user, get_user_profile, update_user_profile
+from entity.user import create_user, verify_user, get_user_profile, update_user_profile, update_user_password
 from utils.jwt_utils import generate_token
-from entity.car import create_car, get_car_by_id, update_car_interests, get_car_listings, update_car, get_car_by_id, increment_views, delete_car_listing_from_db
+from entity.car import create_car, get_car_by_id, update_car_interests, get_car_listings, update_car, increment_views, delete_car_listing_from_db
+from werkzeug.security import check_password_hash, generate_password_hash
 
 # --- User Registration and Login Logic ---
 def handle_register(user_data):
@@ -143,3 +144,26 @@ def update_user_profile_controller(user_id, profile_data):
     Updates the user profile with the given data.
     """
     return update_user_profile(user_id, profile_data)
+
+
+def handle_change_password(user_id, current_password, new_password):
+    """
+    Handles the logic for changing a user's password.
+    """
+    # Verify user identity
+    user = get_user_profile(user_id)
+    if not user:
+        return {"message": "User not found"}, 404
+
+    # Check if the current password matches the stored password hash
+    if not check_password_hash(user['password'], current_password):
+        return {"message": "Current password is incorrect"}, 400
+
+    # Hash the new password
+    new_hashed_password = generate_password_hash(new_password)
+    
+    # Update the password in the database
+    result = update_user_password(user_id, new_hashed_password)
+    if result:
+        return {"message": "Password changed successfully"}
+    return {"message": "Failed to change password"}, 500

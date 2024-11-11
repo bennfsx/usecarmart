@@ -6,7 +6,7 @@ import jwt
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS  # Import CORS
-from boundary.carBoundary import car_blueprint  # Import the car blueprint
+from boundary.carBoundary import car_blueprint
 from boundary.loanBoundary import loan_blueprint
 from boundary.userBoundary import user_blueprint
 
