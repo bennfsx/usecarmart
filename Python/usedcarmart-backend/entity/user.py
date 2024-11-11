@@ -20,3 +20,25 @@ def verify_user(email, password):
     if response.status_code == 200 and response.data:
         return response.data[0]
     return None
+
+# Fetch user profile by ID
+def get_user_profile(user_id):
+    response = supabase.table("users").select("*").eq("id", user_id).execute()
+    if response.data:
+        return response.data[0]  # If the response contains data, return it
+    elif response.error:
+        print(f"Error fetching user profile: {response.error}")
+    return None  # Return None if no data or an error occurs
+
+# Update user profile by ID
+def update_user_profile(user_id, profile_data):
+    # Perform the update operation
+    response = supabase.table("users").update(profile_data).eq("id", user_id).execute()
+    
+    # Check if the response contains an error
+    if response.data is None:
+        print(f"Error updating user profile: {response.error}")
+        return None  # Return None if there was an error
+    
+    # If no error, return the updated data
+    return response.data[0] if response.data else None

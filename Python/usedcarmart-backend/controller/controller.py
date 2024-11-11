@@ -1,7 +1,6 @@
-from entity.user import create_user, verify_user
+from entity.user import create_user, verify_user, get_user_profile, update_user_profile
 from utils.jwt_utils import generate_token
 from entity.car import create_car, get_car_by_id, update_car_interests, get_car_listings, update_car, get_car_by_id, increment_views, delete_car_listing_from_db
-
 
 # --- User Registration and Login Logic ---
 def handle_register(user_data):
@@ -131,3 +130,16 @@ def calculate_monthly_payment(price, down_payment, interest_rate, loan_term_year
     # Standard formula for monthly payment
     monthly_payment = loan_amount * (monthly_rate * (1 + monthly_rate) ** total_payments) / ((1 + monthly_rate) ** total_payments - 1)
     return monthly_payment
+
+# --- User Profile Logic ---
+def get_user_profile_controller(user_id):
+    """
+    Retrieves the user profile information.
+    """
+    return get_user_profile(user_id)
+
+def update_user_profile_controller(user_id, profile_data):
+    """
+    Updates the user profile with the given data.
+    """
+    return update_user_profile(user_id, profile_data)

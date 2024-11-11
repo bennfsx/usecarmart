@@ -11,7 +11,7 @@ const Header = () => {
     const token = localStorage.getItem('token');
     if (token) {
       setIsLoggedIn(true);
-      // Optionally, decode the token and check user role to see if it's a seller
+      // Decode the token and check user role to see if it's a seller
       const decodedToken = JSON.parse(atob(token.split('.')[1]));
       setIsSeller(decodedToken.role === 'seller');  // Check if the user is a seller
     } else {
@@ -46,6 +46,9 @@ const Header = () => {
                   <Link to="/list-car" className="text-white">List a Car</Link>
                 </li>
               )}
+              <li>
+                <Link to="/profile" className="text-white">Profile</Link> {/* Profile link */}
+              </li>
               <li>
                 <button onClick={handleLogout} className="text-white">Logout</button>
               </li>
