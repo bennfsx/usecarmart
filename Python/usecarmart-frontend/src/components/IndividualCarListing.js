@@ -93,9 +93,10 @@ const IndividualCarListing = () => {
   
       const response = await axios.delete(`http://localhost:8000/car-listings/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`, // Send the token in the request headers
-          // Do not include Content-Type for DELETE requests
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'  // Include the Content-Type header
         },
+        data: { seller_id: sellerId }  // Include the seller ID in the request body
       });
   
       if (response.status === 200) {
@@ -107,6 +108,7 @@ const IndividualCarListing = () => {
       alert('Failed to delete the listing.');
     }
   };
+  
   
   
   
