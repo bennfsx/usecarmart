@@ -88,6 +88,21 @@ def login():
         return jsonify({"message": "Invalid credentials"}), 401  # Invalid password
 
 # Test DB Connection Route
+# @app.route('/test-db', methods=['GET'])
+# def test_db_connection():
+#     try:
+#         # Attempt to select all rows from the 'users' table
+#         response = supabase.table('users').select('*').limit(1).execute()
+
+#         # Check if data is retrieved successfully
+#         if response.get('data') is not None:
+#             return jsonify({"status": "success", "data": response['data']})
+#         else:
+#             return jsonify({"status": "error", "message": "No data found or connection issue"}), 500
+#     except Exception as e:
+#         # Handle exceptions such as connection errors
+#         return jsonify({"status": "error", "message": str(e)}), 500
+
 @app.route('/test-db', methods=['GET'])
 def test_db_connection():
     try:
@@ -95,13 +110,14 @@ def test_db_connection():
         response = supabase.table('users').select('*').limit(1).execute()
 
         # Check if data is retrieved successfully
-        if response.get('data') is not None:
-            return jsonify({"status": "success", "data": response['data']})
+        if response.data:  # Use response.data instead of response.get('data')
+            return jsonify({"status": "success", "data": response.data}), 200
         else:
             return jsonify({"status": "error", "message": "No data found or connection issue"}), 500
     except Exception as e:
         # Handle exceptions such as connection errors
         return jsonify({"status": "error", "message": str(e)}), 500
+
 
 # Logout Route (Optional)
 @app.route('/logout', methods=['POST'])
