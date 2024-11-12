@@ -9,7 +9,7 @@ from flask_cors import CORS  # Import CORS
 from boundary.carBoundary import car_blueprint
 from boundary.loanBoundary import loan_blueprint
 from boundary.userBoundary import user_blueprint
-
+from boundary.favoriteBoundary import favorite_blueprint
 # Load environment variables
 load_dotenv()
 
@@ -130,6 +130,7 @@ def logout():
 app.register_blueprint(car_blueprint)
 app.register_blueprint(loan_blueprint, url_prefix='/')
 app.register_blueprint(user_blueprint, url_prefix='/')
+app.register_blueprint(favorite_blueprint, url_prefix='/')
 
 @app.before_request
 def handle_preflight():

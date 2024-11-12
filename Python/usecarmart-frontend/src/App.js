@@ -7,7 +7,8 @@ import ListCar from './components/CarListingForm';
 import Header from './components/Header';
 import IndividualCarListing from './components/IndividualCarListing';
 import LoanCalculator from './components/LoanCalculator';
-import UserProfile from './components/UserProfile'; // Import UserProfile component
+import UserProfile from './components/UserProfile';
+import Favorites from './components/Favorites'; // Import Favorites component
 
 const App = () => {
   return (
@@ -22,7 +23,8 @@ const App = () => {
             <Route path="/list-car" element={<ListCar />} />
             <Route path="/car-listing/:id" element={<IndividualCarListing />} />
             <Route path="/loan-calculator" element={<LoanCalculator />} />
-            <Route path="/profile" element={<UserProfile />} /> {/* Profile route */}
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/favorites" element={<Favorites />} /> {/* Favorites route */}
           </Routes>
         </div>
       </div>

@@ -9,6 +9,7 @@ const IndividualCarListing = () => {
   const [car, setCar] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
   const [editable, setEditable] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false); // New state for favorite status
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -17,37 +18,99 @@ const IndividualCarListing = () => {
   });
 
   useEffect(() => {
-    if (id && !car) { // Check if id exists and car is not yet fetched
-      const fetchCarListing = async () => {
-        try {
-          const response = await axios.get(`http://localhost:8000/car-listings/${id}`);
-          const listing = response.data;
+    const fetchCarListing = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/car-listings/${id}`);
+        const listing = response.data;
   
-          console.log('Fetched car listing:', listing);
-          setCar(listing);
-          setFormData({
-            title: listing.title,
-            description: listing.description,
-            price: listing.price,
-            image_url: listing.image_url,
-          });
+        setCar(listing);
+        setFormData({
+          title: listing.title,
+          description: listing.description,
+          price: listing.price,
+          image_url: listing.image_url,
+        });
   
-          // Decode the JWT token to get the logged-in user's ID
-          const token = localStorage.getItem('token');
-          if (token) {
-            const decodedToken = jwtDecode(token);
-            const userId = decodedToken.id; // Assuming the token contains the 'id' field
-            setIsOwner(listing.seller_id === userId); // Compare seller_id with logged-in user's ID
-            console.log('Logged-in user ID:', userId);
-          }
-        } catch (error) {
-          console.error('Error fetching car listing:', error);
+        const token = localStorage.getItem('token');
+        if (token) {
+          const decodedToken = jwtDecode(token);
+          const userId = decodedToken.id;
+          setIsOwner(listing.seller_id === userId);
+          checkIfFavorited(userId, id); // Pass carId (id) here
         }
-      };
+      } catch (error) {
+        console.error('Error fetching car listing:', error);
+      }
+    };
   
-      fetchCarListing();
+    if (id) fetchCarListing();
+  }, [id]);
+
+  const checkIfFavorited = async (userId, carId) => {
+    try {
+      const response = await axios.get(`http://localhost:8000/favorites?buyer_id=${userId}`);
+      console.log('Favorites API Response:', response.data);
+  
+      if (Array.isArray(response.data)) {
+        response.data.forEach(favorite => {
+          console.log('Favorite Listing:', favorite);
+        });
+  
+        // Convert both favorite.listing_id and carId to string for comparison
+        const isFavorited = response.data.some(favorite => {
+          console.log('Comparing:', favorite.listing_id, 'with', carId);
+          return String(favorite.listing_id) === String(carId); // Cast both to strings
+        });
+  
+        console.log('Is this car favorited?', isFavorited);
+        setIsFavorited(isFavorited);
+      } else {
+        console.error('Unexpected response format:', response.data);
+        setIsFavorited(false);
+      }
+    } catch (error) {
+      console.error('Error checking favorite status:', error);
+      setIsFavorited(false);
     }
-  }, [id]);  // Only depend on `id`, not `car`
+  };
+  
+  
+
+  const handleFavoriteToggle = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.id;
+  
+      console.log('Current favorite status:', isFavorited); // Log current favorite status before toggle
+  
+      // Toggle favorite status based on the current state
+      if (isFavorited) {
+        // Remove from favorites
+        console.log('Removing from favorites');
+        await axios.delete('http://localhost:8000/favorites', {
+          headers: { Authorization: `Bearer ${token}` },
+          data: { buyer_id: userId, listing_id: id }, // Send data in the body for DELETE
+        });
+      } else {
+        // Add to favorites
+        console.log('Adding to favorites');
+        await axios.post(
+          `http://localhost:8000/favorites`,
+          { buyer_id: userId, listing_id: id },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+      }
+  
+      // Toggle the favorite status in your state
+      setIsFavorited(!isFavorited);
+    } catch (error) {
+      console.error('Error while toggling favorite:', error);
+    }
+  };
+  
 
   const handleEditToggle = () => setEditable(!editable);
 
@@ -58,15 +121,15 @@ const IndividualCarListing = () => {
   const handleSave = async () => {
     try {
       const token = localStorage.getItem('token');
-      const decodedToken = jwtDecode(token); // Decode the token to get the user ID
-      const sellerId = decodedToken.id; // Get the seller ID from the token
-  
-      const response = await axios.put(
+      const decodedToken = jwtDecode(token);
+      const sellerId = decodedToken.id;
+
+      await axios.put(
         `http://localhost:8000/car-listings/${id}`,
-        { ...formData, seller_id: sellerId }, // Send the seller_id along with the form data
+        { ...formData, seller_id: sellerId },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Keep this in case you want to check token elsewhere, or you can remove it
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -82,37 +145,31 @@ const IndividualCarListing = () => {
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem('token');
-      const decodedToken = jwtDecode(token); // Decode the token to get the user ID
-      const sellerId = decodedToken.id; // Get the seller ID from the token
-  
-      // Check if the logged-in user is the owner before deleting
+      const decodedToken = jwtDecode(token);
+      const sellerId = decodedToken.id;
+
       if (car.seller_id !== sellerId) {
         alert('You are not authorized to delete this listing');
         return;
       }
-  
+
       const response = await axios.delete(`http://localhost:8000/car-listings/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'  // Include the Content-Type header
+          'Content-Type': 'application/json',
         },
-        data: { seller_id: sellerId }  // Include the seller ID in the request body
+        data: { seller_id: sellerId },
       });
-  
+
       if (response.status === 200) {
         alert('Listing deleted successfully!');
-        navigate('/'); // Redirect to homepage or list of car listings after deletion
+        navigate('/');
       }
     } catch (error) {
       console.error('Error deleting car listing:', error);
       alert('Failed to delete the listing.');
     }
   };
-  
-  
-  
-  
-  
 
   if (!car) return <p>Loading...</p>;
 
@@ -170,6 +227,16 @@ const IndividualCarListing = () => {
               />
             )}
             <p className="text-sm text-gray-600 mt-2">Views: {car.views}</p>
+            {!isOwner && (
+              <button
+                onClick={handleFavoriteToggle}
+                className={`mt-4 px-4 py-2 rounded-md transition-all ${
+                  isFavorited ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                {isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
+              </button>
+            )}
             {isOwner && (
               <div>
                 <button

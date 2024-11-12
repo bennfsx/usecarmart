@@ -1,6 +1,8 @@
 from entity.user import create_user, verify_user, get_user_profile, update_user_profile, update_user_password
 from utils.jwt_utils import generate_token
 from entity.car import create_car, get_car_by_id, update_car_interests, get_car_listings, update_car, increment_views, delete_car_listing_from_db
+from entity.favorite import FavoriteEntity
+
 from werkzeug.security import check_password_hash, generate_password_hash
 
 # --- User Registration and Login Logic ---
@@ -167,3 +169,17 @@ def handle_change_password(user_id, current_password, new_password):
     if result:
         return {"message": "Password changed successfully"}
     return {"message": "Failed to change password"}, 500
+
+# --- Favorites Profile Logic ---
+def add_to_favorites(buyer_id, listing_id):
+    return FavoriteEntity.add_favorite(buyer_id, listing_id)
+
+def get_favorites(buyer_id):
+    return FavoriteEntity.get_favorites(buyer_id)
+
+def search_favorites(buyer_id, search_query):
+    return FavoriteEntity.search_favorites(buyer_id, search_query)
+
+def delete_favorite(buyer_id, listing_id):
+    print(f"Deleting favorite for buyer_id: {buyer_id}, listing_id: {listing_id}")
+    return FavoriteEntity.delete_favorite(buyer_id, listing_id)
