@@ -1,70 +1,78 @@
-from entity.user import create_user, verify_user, get_user_profile, update_user_profile, update_user_password
+from entity.user import (
+    create_user, verify_user, get_user_profile, update_user_profile, update_user_password, check_user_exists
+)
 from utils.jwt_utils import generate_token
-from entity.car import create_car, get_car_by_id, update_car_interests, get_car_listings, update_car, increment_views, delete_car_listing_from_db
+from entity.car import (
+    create_car, get_car_by_id, update_car_interests, get_car_listings, update_car,
+    increment_views, delete_car_listing_from_db
+)
 from entity.favorite import FavoriteEntity
-
+import jwt
+from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash, generate_password_hash
 
 # --- User Registration and Login Logic ---
-def handle_register(user_data):
-    """
-    Handles user registration logic.
-    """
-    user = create_user(user_data)
-    if user:
-        return {"message": "User created successfully", "user": user}
-    return {"message": "Error creating user"}, 400
+def handle_register(data):
+    email = data.get('email')
+    password = data.get('password')
+    role = data.get('role')
+
+    # Check if the user already exists
+    if check_user_exists(email):
+        return {"message": "Email is already registered."}, 400  # Email already exists
+
+    # Hash the password for storage
+    hashed_password = generate_password_hash(password)
+
+    # Insert the new user
+    if create_user(email, hashed_password, role):
+        return {"message": "User registered successfully!"}, 201  # User created successfully
+    else:
+        return {"message": "Failed to register user"}, 500  # Registration failed
 
 def handle_login(login_data):
-    """
-    Handles user login logic and returns JWT token if successful.
-    """
-    email = login_data.get("email")
-    password = login_data.get("password")
-    
-    user = verify_user(email, password)
-    if user:
-        token = generate_token(user)
-        return {"message": "Login successful", "token": token}
-    return {"message": "Invalid credentials"}, 401
+    email = login_data.get('email')
+    password = login_data.get('password')
+
+    # Call the entity layer to verify the user
+    user = verify_user(email=email)  # Only pass email here
+
+    if user and check_password_hash(user['password'], password):
+        # Create JWT token upon successful login
+        payload = {
+            'id': user['id'],
+            'role': user['role'],
+            'exp': datetime.utcnow() + timedelta(hours=1)
+        }
+        token = jwt.encode(payload, "JWT_SECRET_KEY", algorithm='HS256')
+        return {"message": "Login successful", "token": token}, 200
+    else:
+        return {"message": "Invalid credentials"}, 401
 
 # --- Car Listing Logic ---
 def handle_list_car(car_data):
-    """
-    Handles car listing creation logic.
-    """
     description = car_data.get('description')
     price = car_data.get('price')
     title = car_data.get('title')
     image_url = car_data.get('image_url')
-    seller_id = car_data.get('seller_id')  # Should be the logged-in user's ID
+    seller_id = car_data.get('seller_id')
 
     if not description or not price or not title:
         return {"message": "Missing required fields"}, 400
 
-    # Create car listing in the database
     car = create_car(description, price, title, image_url, seller_id)
     if car:
         return {"message": "Car listed successfully", "car": car}
     return {"message": "Error listing car"}, 500
 
 def get_car_listing(car_id):
-    """
-    Handles fetching car listing details by ID.
-    This function increments the views count before fetching the car details.
-    """
-    # Increment the views count before fetching car details
     increment_views(car_id)
-
     car = get_car_by_id(car_id)
     if car:
         return {"car": car}
     return {"message": "Car not found"}, 404
 
 def handle_update_car_interests(car_id, action):
-    """
-    Handles updating car interests (views or shortlist).
-    """
     if action not in ['view', 'shortlist']:
         return {"message": "Invalid action"}, 400
 
@@ -74,97 +82,60 @@ def handle_update_car_interests(car_id, action):
     return {"message": "Error updating interests"}, 500
 
 def handle_get_car_listings(page, limit, search_query, min_price, max_price, sort_by, sort_order):
-    """
-    Handles fetching car listings with pagination, filters, and sorting.
-    """
     listings, total_pages = get_car_listings(page, limit, search_query, min_price, max_price, sort_by, sort_order)
-    return {
-        "listings": listings,
-        "total_pages": total_pages
-    }
+    return {"listings": listings, "total_pages": total_pages}
 
 def fetch_single_car_listing(car_id):
-    """
-    Retrieves a car listing by ID.
-    """
-    # Increment the views count before returning the car listing
     increment_views(car_id)
-
     car_listing = get_car_by_id(car_id)
     if car_listing:
         return car_listing
     return {"message": "Car listing not found"}, 404
 
 def update_single_car_listing(car_id, data, seller_id):
-    """
-    Updates a car listing if the requester is the owner.
-    """
     car_listing = get_car_by_id(car_id)
     if not car_listing:
         return {"message": "Car listing not found"}, 404
 
-    # Check if the requester is the owner
     if car_listing['seller_id'] != seller_id:
         return {"message": "Unauthorized: Only the owner can update this listing"}, 403
 
-    # Perform the update
     updated_listing = update_car(car_id, data)
     if updated_listing:
         return {"message": "Listing updated successfully", "car": updated_listing}, 200
     return {"message": "Failed to update listing"}, 500
 
 def delete_car_listing(car_id, seller_id):
-    """
-    Deletes a car listing from the database if the seller is the owner.
-    """
-    # Call the function that handles the actual deletion logic
     success = delete_car_listing_from_db(car_id, seller_id)
     return success
-
 
 def calculate_monthly_payment(price, down_payment, interest_rate, loan_term_years):
     loan_amount = price - down_payment
     monthly_rate = (interest_rate / 100) / 12
     total_payments = loan_term_years * 12
 
-    if monthly_rate == 0:  # No interest case
+    if monthly_rate == 0:
         return loan_amount / total_payments
 
-    # Standard formula for monthly payment
     monthly_payment = loan_amount * (monthly_rate * (1 + monthly_rate) ** total_payments) / ((1 + monthly_rate) ** total_payments - 1)
     return monthly_payment
 
 # --- User Profile Logic ---
 def get_user_profile_controller(user_id):
-    """
-    Retrieves the user profile information.
-    """
     return get_user_profile(user_id)
 
 def update_user_profile_controller(user_id, profile_data):
-    """
-    Updates the user profile with the given data.
-    """
     return update_user_profile(user_id, profile_data)
 
-
 def handle_change_password(user_id, current_password, new_password):
-    """
-    Handles the logic for changing a user's password.
-    """
-    # Verify user identity
     user = get_user_profile(user_id)
     if not user:
         return {"message": "User not found"}, 404
 
-    # Check if the current password matches the stored password hash
     if not check_password_hash(user['password'], current_password):
         return {"message": "Current password is incorrect"}, 400
 
-    # Hash the new password
     new_hashed_password = generate_password_hash(new_password)
-    
-    # Update the password in the database
     result = update_user_password(user_id, new_hashed_password)
     if result:
         return {"message": "Password changed successfully"}
