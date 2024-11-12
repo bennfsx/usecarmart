@@ -19,16 +19,16 @@ def handle_register(data):
 
     # Check if the user already exists
     if check_user_exists(email):
-        return {"message": "Email is already registered."}, 400  # Email already exists
+        return {"message": "Email is already registered."}, 400 
 
     # Hash the password for storage
     hashed_password = generate_password_hash(password)
 
     # Insert the new user
     if create_user(email, hashed_password, role):
-        return {"message": "User registered successfully!"}, 201  # User created successfully
+        return {"message": "User registered successfully!"}, 201  
     else:
-        return {"message": "Failed to register user"}, 500  # Registration failed
+        return {"message": "Failed to register user"}, 500  
 
 def handle_login(login_data):
     email = login_data.get('email')

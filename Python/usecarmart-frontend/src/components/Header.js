@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 const Header = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isSeller, setIsSeller] = useState(false);  // Track if the user is a seller
+  const [isSeller, setIsSeller] = useState(false); 
 
   useEffect(() => {
     // Check if a token exists in localStorage to determine if the user is logged in
@@ -13,7 +13,7 @@ const Header = () => {
       setIsLoggedIn(true);
       // Decode the token and check user role to see if it's a seller
       const decodedToken = JSON.parse(atob(token.split('.')[1]));
-      setIsSeller(decodedToken.role === 'seller');  // Check if the user is a seller
+      setIsSeller(decodedToken.role === 'seller');  
     } else {
       setIsLoggedIn(false);
       setIsSeller(false);
@@ -25,7 +25,7 @@ const Header = () => {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
     setIsSeller(false);
-    navigate('/login');  // Redirect to login page
+    navigate('/login');  
   };
 
   return (

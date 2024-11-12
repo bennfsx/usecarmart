@@ -29,19 +29,19 @@ def create_car(description, price, title, image_url, seller_id):
             return {
                 "message": "Car listing created successfully!",
                 "car": response.data[0]
-            }, 201  # Returning success message with the created car data
+            }, 201  
         else:
             return {
                 "message": "Failed to create car listing",
                 "details": response.error
-            }, 500  # Returning failure message with error details
+            }, 500  
 
     except Exception as e:
         print(f"Error creating car: {e}")
         return {
             "message": "Error occurred while creating car listing",
             "error": str(e)
-        }, 500  # Handling general errors and returning failure message
+        }, 500  
 
 def get_car_by_id(car_id):
     """
@@ -156,10 +156,10 @@ def delete_car_listing_from_db(car_id, seller_id):
         # Fetch the car listing by ID
         car_listing = get_car_by_id(car_id)
         if not car_listing:
-            return False  # Car not found
+            return False  
 
         if car_listing['seller_id'] != seller_id:
-            return False  # Seller is not the owner, cannot delete
+            return False  
 
         # Perform the deletion of the car listing from the database
         response = supabase.table('car_listings').delete().eq('id', car_id).execute()

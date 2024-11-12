@@ -7,14 +7,13 @@ user_blueprint = Blueprint('user', __name__)
 @user_blueprint.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    result = handle_register(data)  # Pass the data to controller and get result and status
-    return jsonify(result)  # Return the result and the status code directly
+    result = handle_register(data)  
+    return jsonify(result)  
 
 # Login route in boundary layer
 @user_blueprint.route('/login', methods=['POST'])
 def login():
     login_data = request.get_json()
-    # Pass the login data to the controller to handle the logic
     message, status_code = handle_login(login_data)
     return jsonify(message), status_code
 
@@ -30,8 +29,8 @@ def get_user_profile(user_id):
 # Route to edit user profile by ID (PUT request)
 @user_blueprint.route('/profile/<int:user_id>', methods=['PUT'])
 def edit_user_profile(user_id):
-    data = request.get_json()  # Get data from the request body
-    updated_user = update_user_profile_controller(user_id, data)  # Call the controller method
+    data = request.get_json()  
+    updated_user = update_user_profile_controller(user_id, data)  
     if updated_user:
         return jsonify({"message": "Profile updated successfully", "user": updated_user}), 200
     return jsonify({"message": "Failed to update profile"}), 500
@@ -39,7 +38,7 @@ def edit_user_profile(user_id):
 # Route to change password (PUT request)
 @user_blueprint.route('/profile/<int:user_id>/password', methods=['PUT'])
 def change_password(user_id):
-    data = request.get_json()  # Get data from the request body
+    data = request.get_json()  
     current_password = data.get('current_password')
     new_password = data.get('new_password')
 
@@ -48,9 +47,8 @@ def change_password(user_id):
 
     result = handle_change_password(user_id, current_password, new_password)
     return jsonify(result)
-
-# Logout Route (Optional)
+ 
+# Logout Route
 @user_blueprint.route('/logout', methods=['POST'])
 def logout():
-    # This is just a placeholder, as the client will manage token removal.
     return jsonify({"message": "Logout successful"}), 200

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode'; // Correct named import
+import { jwtDecode } from 'jwt-decode'; 
 import 'react-toastify/dist/ReactToastify.css';
 
 const CarListingForm = () => {
@@ -10,26 +10,23 @@ const CarListingForm = () => {
   const [price, setPrice] = useState('');
   const [title, setTitle] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [isEdit, setIsEdit] = useState(false); // New state for tracking edit mode
-  const navigate = useNavigate(); // Initialize useNavigate
-  const { carId } = useParams(); // Retrieve carId from URL params for editing a listing
-
-  // Retrieve the JWT token from localStorage
-  const token = localStorage.getItem('token'); // Replace 'token' with your actual token key
+  const [isEdit, setIsEdit] = useState(false); 
+  const navigate = useNavigate(); 
+  const { carId } = useParams(); 
+  const token = localStorage.getItem('token'); 
 
   // Decode the JWT token to get the userId
   let sellerId = null;
   if (token) {
-    const decodedToken = jwtDecode(token); // Decode token to get the seller's ID
-    sellerId = decodedToken.id; // Adjust this based on the structure of your token
+    const decodedToken = jwtDecode(token); 
+    sellerId = decodedToken.id; 
   }
 
-  console.log("Retrieved sellerId:", sellerId); // Log the decoded sellerId
 
   // Fetch car data if editing an existing listing
   useEffect(() => {
     if (carId) {
-      setIsEdit(true); // Set to edit mode if carId is provided in the URL
+      setIsEdit(true); 
       axios
         .get(`http://localhost:8000/car-listings/${carId}`)
         .then((response) => {
@@ -70,7 +67,7 @@ const CarListingForm = () => {
       price,
       title,
       image_url: imageUrl,
-      seller_id: sellerId, // Add seller_id from decoded token
+      seller_id: sellerId, 
     };
 
     try {

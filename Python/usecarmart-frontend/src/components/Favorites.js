@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode'; // Correct import
+import { jwtDecode } from 'jwt-decode'; 
 
 const Favorites = () => {
   const [favorites, setFavorites] = useState([]);
@@ -18,25 +18,23 @@ const Favorites = () => {
   const fetchFavorites = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token'); // Get the token from localStorage
-      const decodedToken = jwtDecode(token); // Decode the JWT token
-      const buyerId = decodedToken.id; // Get the buyer ID from the decoded token
+      const token = localStorage.getItem('token'); 
+      const decodedToken = jwtDecode(token); 
+      const buyerId = decodedToken.id; 
 
       const response = await axios.get(`http://localhost:8000/favorites?buyer_id=${buyerId}&page=${page}`);
-      console.log('API Response:', response.data); // Log the response from the API for verification
 
       // Check if the response data is an array before setting favorites
       const favoriteListings = await Promise.all(response.data.map(async (favorite) => {
         // Fetch car listing based on listing_id from the favorite
         const listingResponse = await axios.get(`http://localhost:8000/car-listings/${favorite.listing_id}`);
-        return { ...favorite, listing: listingResponse.data }; // Combine the favorite and car listing data
+        return { ...favorite, listing: listingResponse.data }; 
       }));
 
       setFavorites(favoriteListings);
-      setTotalPages(response.data.totalPages || 1); // Assuming the API returns totalPages
+      setTotalPages(response.data.totalPages || 1); 
     } catch (error) {
       setError('Failed to load favorites.');
-      console.error('Error fetching favorites:', error);  // Log error for debugging
     } finally {
       setLoading(false);
     }
@@ -48,12 +46,12 @@ const Favorites = () => {
       const token = localStorage.getItem('token');
       const decodedToken = jwtDecode(token);
       const buyerId = decodedToken.id;
-      console.log('Search Query:', searchQuery); // Log the search query for verification
+      
 
       const response = await axios.get(
         `http://localhost:8000/favorites/search?buyer_id=${buyerId}&query=${searchQuery}`
       );
-      console.log('Search API Response:', response.data); // Log the search response
+      
 
       const favoriteListings = await Promise.all(response.data.map(async (favorite) => {
         const listingResponse = await axios.get(`http://localhost:8000/car-listings/${favorite.listing_id}`);
@@ -63,7 +61,6 @@ const Favorites = () => {
       setFavorites(favoriteListings);
     } catch (error) {
       setError('No matches found.');
-      console.error('Error searching favorites:', error); // Log error for debugging
     } finally {
       setLoading(false);
     }
@@ -80,10 +77,10 @@ const Favorites = () => {
         data: { buyer_id: buyerId, listing_id: listingId },
       });
       alert('Listing removed from favorites!');
-      fetchFavorites(); // Refresh the list of favorites
+      fetchFavorites(); 
     } catch (error) {
       setError('Failed to remove listing from favorites.');
-      console.error('Error removing favorite:', error); // Log error for debugging
+      console.error('Error removing favorite:', error); 
     } finally {
       setLoading(false);
     }

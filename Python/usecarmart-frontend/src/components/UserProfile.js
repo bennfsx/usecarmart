@@ -28,10 +28,9 @@ const UserProfile = () => {
 
       try {
         // Decode the token to get userId from the payload
-        const decodedToken = jwtDecode(token); // Correct usage of jwt-decode
-        const userId = decodedToken.id; // Assuming the userId is stored in the 'id' field in the token
+        const decodedToken = jwtDecode(token); 
+        const userId = decodedToken.id; 
         
-        console.log("Decoded userId from token:", userId); // Debugging line
 
         if (!userId) {
           setError("User ID is missing in the token.");
@@ -47,7 +46,6 @@ const UserProfile = () => {
         });
         setUserData(response.data);
       } catch (error) {
-        console.error("Error decoding token or fetching user data:", error);
         setError("Failed to load user data.");
       } finally {
         setLoading(false);
@@ -76,7 +74,6 @@ const UserProfile = () => {
       alert("Profile updated successfully!");
       setIsEditing(false);
     } catch (error) {
-      console.error("Error updating profile:", error);
       setError("Failed to update profile.");
     } finally {
       setLoading(false);
@@ -89,9 +86,7 @@ const UserProfile = () => {
     const token = localStorage.getItem('token');
     const decodedToken = jwtDecode(token); // Correct usage of jwt-decode
     const userId = decodedToken.id; // Extract userId from token
-    
-    console.log("Current password:", userData.currentPassword);
-    console.log("New password:", userData.newPassword);
+
   
     try {
       // Sending both current_password and new_password in the request body
@@ -108,7 +103,6 @@ const UserProfile = () => {
       alert("Password updated successfully!");
       setIsPasswordEditing(false);
     } catch (error) {
-      console.error("Error updating password:", error);
       setError("Failed to update password.");
     } finally {
       setLoading(false);

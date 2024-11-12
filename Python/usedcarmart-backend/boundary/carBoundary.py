@@ -15,17 +15,16 @@ car_blueprint = Blueprint('car', __name__)
 # Route to list a car (POST request)
 @car_blueprint.route('/list-car', methods=['POST'])
 def list_car():
-    car_data = request.get_json()  # Get JSON data from the request
+    car_data = request.get_json()  
     description = car_data.get('description')
     price = car_data.get('price')
     title = car_data.get('title')
     image_url = car_data.get('image_url')
     seller_id = car_data.get('seller_id')
 
-    # Call the create_car function from controller
     result, status_code = create_car(description, price, title, image_url, seller_id)
 
-    return jsonify(result), status_code  # Return the response with result and status code
+    return jsonify(result), status_code  
 
 # Route to get car details by ID (GET request)
 @car_blueprint.route('/car/<int:car_id>', methods=['GET'])
@@ -56,7 +55,6 @@ def get_paginated_car_listings():
         page = int(request.args.get('page', 1))
         limit = int(request.args.get('limit', 8))
 
-        # Call the get_car_listings function from controller
         result, total_pages = get_car_listings(page, limit)
 
         if result:
@@ -92,7 +90,7 @@ def car_listing(car_id):
         data = request.get_json()
 
         # Extract the seller_id from the data
-        seller_id = data.get('seller_id')  # Ensure seller_id is passed in the request body
+        seller_id = data.get('seller_id')
 
         # Ensure that the logged-in seller can only edit their own listing
         if car_listing['seller_id'] != seller_id:

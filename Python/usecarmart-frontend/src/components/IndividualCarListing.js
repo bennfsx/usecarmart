@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode'; // Correct import
+import { jwtDecode } from 'jwt-decode'; 
 
 const IndividualCarListing = () => {
   const { id } = useParams();
@@ -9,7 +9,7 @@ const IndividualCarListing = () => {
   const [car, setCar] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
   const [editable, setEditable] = useState(false);
-  const [isFavorited, setIsFavorited] = useState(false); // New state for favorite status
+  const [isFavorited, setIsFavorited] = useState(false); 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -36,10 +36,9 @@ const IndividualCarListing = () => {
           const decodedToken = jwtDecode(token);
           const userId = decodedToken.id;
           setIsOwner(listing.seller_id === userId);
-          checkIfFavorited(userId, id); // Pass carId (id) here
+          checkIfFavorited(userId, id); 
         }
       } catch (error) {
-        console.error('Error fetching car listing:', error);
       }
     };
   
@@ -49,27 +48,21 @@ const IndividualCarListing = () => {
   const checkIfFavorited = async (userId, carId) => {
     try {
       const response = await axios.get(`http://localhost:8000/favorites?buyer_id=${userId}`);
-      console.log('Favorites API Response:', response.data);
   
       if (Array.isArray(response.data)) {
         response.data.forEach(favorite => {
-          console.log('Favorite Listing:', favorite);
         });
   
         // Convert both favorite.listing_id and carId to string for comparison
         const isFavorited = response.data.some(favorite => {
-          console.log('Comparing:', favorite.listing_id, 'with', carId);
-          return String(favorite.listing_id) === String(carId); // Cast both to strings
+          return String(favorite.listing_id) === String(carId); 
         });
   
-        console.log('Is this car favorited?', isFavorited);
         setIsFavorited(isFavorited);
       } else {
-        console.error('Unexpected response format:', response.data);
         setIsFavorited(false);
       }
     } catch (error) {
-      console.error('Error checking favorite status:', error);
       setIsFavorited(false);
     }
   };
@@ -82,19 +75,16 @@ const IndividualCarListing = () => {
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.id;
   
-      console.log('Current favorite status:', isFavorited); // Log current favorite status before toggle
   
       // Toggle favorite status based on the current state
       if (isFavorited) {
-        // Remove from favorites
-        console.log('Removing from favorites');
+
         await axios.delete('http://localhost:8000/favorites', {
           headers: { Authorization: `Bearer ${token}` },
-          data: { buyer_id: userId, listing_id: id }, // Send data in the body for DELETE
+          data: { buyer_id: userId, listing_id: id }, 
         });
       } else {
         // Add to favorites
-        console.log('Adding to favorites');
         await axios.post(
           `http://localhost:8000/favorites`,
           { buyer_id: userId, listing_id: id },
@@ -107,7 +97,6 @@ const IndividualCarListing = () => {
       // Toggle the favorite status in your state
       setIsFavorited(!isFavorited);
     } catch (error) {
-      console.error('Error while toggling favorite:', error);
     }
   };
   
@@ -137,7 +126,6 @@ const IndividualCarListing = () => {
       setEditable(false);
       alert('Listing updated successfully!');
     } catch (error) {
-      console.error('Error updating car listing:', error);
       alert('Failed to update the listing.');
     }
   };
@@ -166,7 +154,6 @@ const IndividualCarListing = () => {
         navigate('/');
       }
     } catch (error) {
-      console.error('Error deleting car listing:', error);
       alert('Failed to delete the listing.');
     }
   };
