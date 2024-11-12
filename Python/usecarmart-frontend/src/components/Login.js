@@ -29,15 +29,18 @@ const Login = () => {
 
       // Store buyerId (could use state management like Context API or directly in localStorage)
       localStorage.setItem('buyerId', buyerId);
-
+      
       // Redirect to the appropriate page based on the user's role
       // You could check the role from the decoded token to navigate the user accordingly
       if (decodedToken.role === 'buyer') {
         navigate('/');
+        window.location.reload()
       } else if (decodedToken.role === 'seller') {
         navigate('/');
+        window.location.reload()
       } else {
         navigate('/');
+        window.location.reload()
       }
     } catch (err) {
       setError('Invalid credentials');
