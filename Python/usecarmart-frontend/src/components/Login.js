@@ -33,9 +33,9 @@ const Login = () => {
       // Redirect to the appropriate page based on the user's role
       // You could check the role from the decoded token to navigate the user accordingly
       if (decodedToken.role === 'buyer') {
-        navigate('/home');
+        navigate('/');
       } else if (decodedToken.role === 'seller') {
-        navigate('/home');
+        navigate('/');
       } else {
         navigate('/');
       }
