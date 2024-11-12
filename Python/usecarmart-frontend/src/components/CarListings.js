@@ -8,7 +8,7 @@ const CarListings = () => {
   const [search, setSearch] = useState('');
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(1000000);
-  const [buyerId, setBuyerId] = useState(null); // Get buyer's ID from token or session
+  const [buyerId, setBuyerId] = useState(null); 
 
   useEffect(() => {
     axios
