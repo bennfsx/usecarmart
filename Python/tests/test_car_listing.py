@@ -1,3 +1,5 @@
+# Focus on testing the controllers' logic and interactions with the service layer.
+
 import pytest
 from unittest.mock import patch
 from controller.controller import handle_list_car, get_car_listing, handle_update_car_interests

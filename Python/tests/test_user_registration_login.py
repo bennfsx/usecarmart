@@ -1,3 +1,5 @@
+# Focus on testing the controllers' logic and interactions with the service layer.
+
 # controller/controller.py
 import pytest
 from unittest.mock import patch

@@ -1,4 +1,5 @@
 # PYTHONPATH=Python/usedcarmart-backend pytest -v -s Python/tests/test_user.py
+# Focus on testing data models, persistence, and business rules tied to entities.
 
 import pytest
 from unittest.mock import patch, MagicMock
