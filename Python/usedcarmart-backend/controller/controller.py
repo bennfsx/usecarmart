@@ -1,5 +1,5 @@
 from entity.user import (
-    create_user, verify_user, get_user_profile, update_user_profile, update_user_password, check_user_exists
+    create_user, verify_user, get_user_profile, update_user_profile, update_user_password, check_user_exists, get_user_profile_from_db, get_reviews_for_agent_from_db, get_all_agents
 )
 from utils.jwt_utils import generate_token
 from entity.car import (
@@ -10,6 +10,8 @@ from entity.favorite import FavoriteEntity
 import jwt
 from datetime import datetime, timedelta
 from werkzeug.security import check_password_hash, generate_password_hash
+
+from entity.review import ReviewEntity
 
 # --- User Registration and Login Logic ---
 def handle_register(data):
@@ -154,3 +156,48 @@ def search_favorites(buyer_id, search_query):
 def delete_favorite(buyer_id, listing_id):
     print(f"Deleting favorite for buyer_id: {buyer_id}, listing_id: {listing_id}")
     return FavoriteEntity.delete_favorite(buyer_id, listing_id)
+
+# --- Reviews function Logic ---
+def create_review(agent_id, reviewer_id, role, rating, review_text):
+    # Call the entity to create a review and return the result
+    review = ReviewEntity.create_review(agent_id, reviewer_id, role, rating, review_text)
+    return review
+
+# Function to get reviews for a specific agent
+def get_reviews_for_agent(agent_id):
+    # Call the entity to get all reviews for the specified agent
+    reviews = ReviewEntity.get_reviews_for_agent(agent_id)
+    return reviews
+
+# Function to get reviews by a specific reviewer
+def get_reviews_by_reviewer(reviewer_id):
+    # Call the entity to get all reviews written by the specified reviewer
+    reviews = ReviewEntity.get_reviews_by_reviewer(reviewer_id)
+    return reviews
+
+# --- Get Agent Logic  ---
+def get_agent_details(agent_id):
+    # Fetch the agent's profile using the entity layer
+    agent_profile = get_user_profile_from_db(agent_id)
+    if not agent_profile:
+        return {"message": "Agent not found"}, 404
+    
+    # Fetch the agent's reviews using the entity layer
+    agent_reviews = get_reviews_for_agent_from_db(agent_id)
+    
+    # Return the agent's profile along with the reviews
+    return {
+        "agent_profile": agent_profile,
+        "reviews": agent_reviews
+    }, 200
+    
+# Controller function to get all agents
+def get_all_agents_details():
+    try:
+        agents_data = get_all_agents()  # Call the entity function to get agents
+        if agents_data:
+            return agents_data, 200  # Return the agents data with a success status code
+        else:
+            return {"message": "No agents found"}, 404  # If no agents are found
+    except Exception as e:
+        return {"message": str(e)}, 500  # Handle unexpected errors
