@@ -9,7 +9,7 @@ const IndividualCarListing = () => {
   const [car, setCar] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
   const [editable, setEditable] = useState(false);
-  const [isFavorited, setIsFavorited] = useState(false); 
+  const [isFavorited, setIsFavorited] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -24,7 +24,7 @@ const IndividualCarListing = () => {
       try {
         const response = await axios.get(`http://localhost:8000/car-listings/${id}`);
         const listing = response.data;
-  
+
         setCar(listing);
         setFormData({
           title: listing.title,
@@ -32,13 +32,13 @@ const IndividualCarListing = () => {
           price: listing.price,
           image_url: listing.image_url,
         });
-  
+
         const token = localStorage.getItem('token');
         if (token) {
           const decodedToken = jwtDecode(token);
           const userId = decodedToken.id;
           setIsOwner(listing.seller_id === userId);
-          checkIfFavorited(userId, id); 
+          checkIfFavorited(userId, id);
         }
 
         // Set the agent details if available
@@ -49,7 +49,7 @@ const IndividualCarListing = () => {
         console.error('Error fetching car listing:', error);
       }
     };
-  
+
     if (id) fetchCarListing();
   }, [id]);
 
@@ -98,26 +98,49 @@ const IndividualCarListing = () => {
   const handleSave = async () => {
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in to update the listing.');
+        return;
+      }
+  
       const decodedToken = jwtDecode(token);
       const sellerId = decodedToken.id;
-
-      await axios.put(
+  
+      // Ensure that the seller_id matches the one from the decoded token
+      if (car.seller_id !== sellerId) {
+        alert('You are not authorized to update this listing.');
+        return;
+      }
+  
+      // Send the PUT request with seller_id included
+      const response = await axios.put(
         `http://localhost:8000/car-listings/${id}`,
-        { ...formData, seller_id: sellerId },
+        { ...formData, seller_id: sellerId },  // Ensure seller_id is included
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      setCar({ ...car, ...formData });
-      setEditable(false);
-      alert('Listing updated successfully!');
+  
+      if (response.status === 200) {
+        setCar({ ...car, ...formData });
+        setEditable(false);
+        alert('Listing updated successfully!');
+      } else {
+        alert('Failed to update the listing.');
+      }
     } catch (error) {
+      console.error('Error updating listing:', error);
       alert('Failed to update the listing.');
     }
   };
-
+  
+  
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in to delete the listing.');
+        return;
+      }
+
       const decodedToken = jwtDecode(token);
       const sellerId = decodedToken.id;
 
@@ -137,6 +160,7 @@ const IndividualCarListing = () => {
       }
     } catch (error) {
       alert('Failed to delete the listing.');
+      console.error('Error deleting listing:', error);
     }
   };
 

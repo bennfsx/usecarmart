@@ -17,10 +17,10 @@ const Register = () => {
       console.log("STATUS", response.status);
 
       if (response.data[0].message === "User registered successfully!") {
-        setError(''); // Clear any previous errors
-        setShowSuccessModal(true); // Show success modal on successful registration
+        setError(''); 
+        setShowSuccessModal(true); 
       } else {
-        setError(response.data[0].message); // Display the error message from server
+        setError(response.data[0].message); 
       }
     } catch (err) {
       setError('Registration failed. Please try again later.');
@@ -28,8 +28,8 @@ const Register = () => {
   };
 
   const handleModalClose = () => {
-    setShowSuccessModal(false); // Close the success modal
-    navigate('/login'); // Redirect to login page
+    setShowSuccessModal(false); 
+    navigate('/login'); 
   };
 
   return (

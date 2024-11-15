@@ -80,7 +80,7 @@ def car_listing(car_id):
         # Increment the views count every time the car listing is viewed
         increment_views(car_id)
 
-        # Fetch the updated car listing by ID
+        # Fetch the car listing by ID
         car_listing = get_car_by_id(car_id)
         if car_listing:
             return jsonify(car_listing), 200
@@ -95,15 +95,15 @@ def car_listing(car_id):
         # Get the data from the request body
         data = request.get_json()
 
-        # Extract the seller_id from the data
+        # Extract seller_id from the data sent in the request
         seller_id = data.get('seller_id')
 
-        # Ensure that the logged-in seller can only edit their own listing
+        # Ensure the logged-in seller can only edit their own listing
         if car_listing['seller_id'] != seller_id:
             return jsonify({"message": "Unauthorized to edit this listing"}), 403
 
-        # Now call the update function with car_id, seller_id, and data
-        updated_listing = update_single_car_listing(car_id, seller_id, data)
+        # Call the function to update the listing
+        updated_listing = update_single_car_listing(car_id, data, seller_id)
 
         if updated_listing:
             return jsonify({"message": "Listing updated successfully", "car": updated_listing}), 200
@@ -115,15 +115,15 @@ def car_listing(car_id):
         if not car_listing:
             return jsonify({"message": "Car listing not found"}), 404
 
-        # Extract the seller_id from the request body
-        seller_id = request.get_json().get('seller_id')  # Ensure seller_id is passed in the request body
+        # Extract the seller_id from the request body (must match the logged-in seller)
+        seller_id = request.get_json().get('seller_id')
 
         # Ensure that the logged-in seller can only delete their own listing
         if car_listing['seller_id'] != seller_id:
             return jsonify({"message": "Unauthorized to delete this listing"}), 403
 
-        # Now call the delete function with both car_id and seller_id
-        delete_success = delete_car_listing(car_id, seller_id)  # Pass both car_id and seller_id
+        # Call the delete function with both car_id and seller_id
+        delete_success = delete_car_listing(car_id, seller_id)
 
         if delete_success:
             return jsonify({"message": "Listing deleted successfully"}), 200
