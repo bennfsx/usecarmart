@@ -8,16 +8,16 @@ const AgentList = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch agent data from the backend API
+  
   useEffect(() => {
     axios
-      .get('http://localhost:8000/agents') // API call to fetch all agents
+      .get('http://localhost:8000/agents') 
       .then((response) => {
-        setAgents(response.data); // Set agents directly from the response data
-        setLoading(false); // Set loading to false when the data is fetched
+        setAgents(response.data); 
+        setLoading(false); 
       })
       .catch((err) => {
-        setError("Failed to load agents. Please try again."); // Handle any errors
+        setError("Failed to load agents. Please try again."); 
         setLoading(false);
       });
   }, []);

@@ -16,8 +16,8 @@ const IndividualCarListing = () => {
     price: '',
     image_url: '',
   });
-  const [showAgentPopup, setShowAgentPopup] = useState(false); // for showing the agent popup
-  const [agentDetails, setAgentDetails] = useState(null); // for storing agent details
+  const [showAgentPopup, setShowAgentPopup] = useState(false); 
+  const [agentDetails, setAgentDetails] = useState(null); 
 
   useEffect(() => {
     const fetchCarListing = async () => {

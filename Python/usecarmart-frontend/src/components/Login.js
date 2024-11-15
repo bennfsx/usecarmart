@@ -23,15 +23,14 @@ const Login = () => {
       const { token } = response.data;
       localStorage.setItem('token', token);
 
-      // Decode JWT to extract user information (you can use jwt-decode library for this)
-      const decodedToken = decodeJWT(token); // Assuming decodeJWT is a function to decode the JWT
+      
+      const decodedToken = decodeJWT(token); 
       const buyerId = decodedToken.buyerId;
 
-      // Store buyerId (could use state management like Context API or directly in localStorage)
+      
       localStorage.setItem('buyerId', buyerId);
       
-      // Redirect to the appropriate page based on the user's role
-      // You could check the role from the decoded token to navigate the user accordingly
+      
       if (decodedToken.role === 'buyer') {
         navigate('/');
         window.location.reload()
