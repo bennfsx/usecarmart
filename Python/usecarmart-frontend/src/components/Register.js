@@ -35,7 +35,7 @@ const Register = () => {
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-50 py-10">
       <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-lg">
-        <h2 className="text-3xl font-semibold text-center text-blue-600 mb-6">Create an Account</h2>
+        <h2 className="text-3xl font-semibold text-center text-blue-600 mb-6">Create an User Account</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700" htmlFor="email">Email Address</label>
@@ -85,9 +85,7 @@ const Register = () => {
           </button>
         </form>
 
-        <div className="mt-4 text-center text-sm text-gray-600">
-          <p>Already have an account? <a href="/login" className="text-blue-500 hover:text-blue-600">Login here</a></p>
-        </div>
+    
       </div>
 
       {/* Success Modal */}
@@ -95,7 +93,7 @@ const Register = () => {
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full text-center">
             <h3 className="text-xl font-semibold text-green-500 mb-4">Registration Successful!</h3>
-            <p className="text-gray-700 mb-4">Your account has been successfully created.</p>
+            <p className="text-gray-700 mb-4">User account has been successfully created.</p>
             <button 
               onClick={handleModalClose} 
               className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
