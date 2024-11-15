@@ -177,6 +177,13 @@ def get_reviews_by_reviewer(reviewer_id):
     reviews = ReviewEntity.get_reviews_by_reviewer(reviewer_id)
     return reviews
 
+def get_all_reviews():
+    try:
+        # Call the entity method to get all reviews
+        return ReviewEntity.get_all_reviews()
+    except Exception as e:
+        return {"error": str(e)}
+
 # --- Get Agent Logic  ---
 def get_agent_details(agent_id):
     # Fetch the agent's profile using the entity layer

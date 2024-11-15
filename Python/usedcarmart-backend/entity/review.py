@@ -63,3 +63,17 @@ class ReviewEntity:
                 return {"message": "No reviews found for this reviewer"}
         except Exception as e:
             return {"error": str(e)}
+
+    @staticmethod
+    def get_all_reviews():
+        try:
+            # Retrieve all reviews from the 'reviews' table
+            response = supabase.table("reviews").select("*").execute()
+            
+            # Check for response success
+            if response.data:
+                return response.data
+            else:
+                return {"message": "No reviews available"}
+        except Exception as e:
+            return {"error": str(e)}

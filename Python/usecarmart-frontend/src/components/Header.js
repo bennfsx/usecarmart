@@ -72,14 +72,11 @@ const Header = () => {
                 )}
                 {userRole === 'seller' && (
                   <li>
-                    <Link to="/reviews" className="hover:text-gray-300 transition">Manage Reviews</Link>
-                  </li>
+                  <Link to={`/reviews/agent/${userId}/buyer`} className="hover:text-gray-300 transition">Review Agent</Link>
+                </li>
                 )}
                 {userRole === 'buyer' && (
                   <>
-                    <li>
-                      <Link to="/reviews" className="hover:text-gray-300 transition">View Reviews</Link>
-                    </li>
                     <li>
                       <Link to={`/reviews/agent/${userId}/buyer`} className="hover:text-gray-300 transition">Review Agent</Link>
                     </li>

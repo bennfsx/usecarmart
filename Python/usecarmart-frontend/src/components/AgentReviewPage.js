@@ -1,6 +1,6 @@
 import React from "react";
 import ReviewForm from "./ReviewForm";
-import ReviewList from "./ReviewList";
+
 
 const AgentReviewPage = ({ agentId, reviewerId }) => {
   return (
@@ -11,8 +11,7 @@ const AgentReviewPage = ({ agentId, reviewerId }) => {
         {/* Review Form */}
         <ReviewForm agentId={agentId} reviewerId={reviewerId} />
 
-        {/* Reviews List */}
-        <ReviewList agentId={agentId} />
+       
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from controller.controller import create_review, get_reviews_for_agent, get_reviews_by_reviewer
+from controller.controller import create_review, get_reviews_for_agent, get_reviews_by_reviewer, get_all_reviews
 
 review_blueprint = Blueprint('review_blueprint', __name__)
 
@@ -54,6 +54,20 @@ def get_reviews_by_reviewer_endpoint(reviewer_id):
             return jsonify({"reviews": reviews}), 200
         else:
             return jsonify({"message": "No reviews found for this reviewer"}), 404
+    
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
+@review_blueprint.route('/reviews', methods=['GET'])
+def get_all_reviews_endpoint():
+    try:
+        # Call the controller to get all reviews
+        reviews = get_all_reviews()
+        
+        if reviews:
+            return jsonify({"reviews": reviews}), 200
+        else:
+            return jsonify({"message": "No reviews available"}), 404
     
     except Exception as e:
         return jsonify({"message": str(e)}), 500
