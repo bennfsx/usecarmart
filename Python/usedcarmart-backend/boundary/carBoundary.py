@@ -15,17 +15,23 @@ car_blueprint = Blueprint('car', __name__)
 # Route to list a car (POST request)
 @car_blueprint.route('/list-car', methods=['POST'])
 def list_car():
-    car_data = request.get_json()  
-    description = car_data.get('description')
-    price = car_data.get('price')
-    title = car_data.get('title')
-    image_url = car_data.get('image_url')
-    seller_id = car_data.get('seller_id')
+    # Gather form data
+    description = request.json.get('description')
+    price = request.json.get('price')
+    title = request.json.get('title')
+    image_url = request.json.get('image_url')
+    seller_id = request.json.get('seller_id')
+    agent_id = request.json.get('agent_id')
 
-    result, status_code = create_car(description, price, title, image_url, seller_id)
+    # Call the create_car function and handle its return value
+    result, status_code = create_car(description, price, title, image_url, seller_id, agent_id)
 
-    return jsonify(result), status_code  
+    # Check if the result is None, and handle appropriately
+    if result is None:
+        return {"message": "Error creating car listing"}, 400  # Bad Request error or you can use another code
 
+    # If the car is created successfully
+    return result, status_code
 # Route to get car details by ID (GET request)
 @car_blueprint.route('/car/<int:car_id>', methods=['GET'])
 def get_car_listing(car_id):

@@ -58,14 +58,16 @@ def handle_list_car(car_data):
     title = car_data.get('title')
     image_url = car_data.get('image_url')
     seller_id = car_data.get('seller_id')
+    agent_id = car_data.get('agent_id')  # New agent field
 
-    if not description or not price or not title:
+    if not description or not price or not title or not agent_id:
         return {"message": "Missing required fields"}, 400
 
-    car = create_car(description, price, title, image_url, seller_id)
+    car = create_car(description, price, title, image_url, seller_id, agent_id)
     if car:
         return {"message": "Car listed successfully", "car": car}
     return {"message": "Error listing car"}, 500
+
 
 def get_car_listing(car_id):
     increment_views(car_id)

@@ -9,39 +9,44 @@ url = os.getenv('SUPABASE_URL')
 key = os.getenv('SUPABASE_KEY')
 supabase: Client = create_client(url, key)
 
-def create_car(description, price, title, image_url, seller_id):
-    """
-    Creates a new car listing in the database.
-    """
+def create_car(description, price, title, image_url, seller_id, agent_id):
+    # Example car data structure with added agent_id field
+    car_data = {
+        "description": description,
+        "price": price,
+        "title": title,
+        "image_url": image_url,
+        "seller_id": seller_id,
+        "agent_id": agent_id,  # Include agent_id in the car listing
+        "views": 0,
+        "created_at": "now()"
+    }
+
     try:
-        response = supabase.table('car_listings').insert({
-            'description': description,
-            'price': price,
-            'title': title,
-            'image_url': image_url,
-            'seller_id': seller_id,
-            'views': 0,  # Initial views count
-            'shortlist_count': 0  # Initial shortlist count
-        }).execute()
+        # Insert car data into the "car_listings" table in Supabase
+        response = supabase.table("car_listings").insert(car_data).execute()
 
-        # Check if the response contains the data
-        if response.data:
-            return {
-                "message": "Car listing created successfully!",
-                "car": response.data[0]
-            }, 201  
-        else:
-            return {
-                "message": "Failed to create car listing",
-                "details": response.error
-            }, 500  
+        # Debug: print the whole response to understand its structure
+        print(f"Response: {response}")
 
+        # Check if the response has an error (this might not be a simple `.error` attribute)
+        if hasattr(response, 'error') and response.error:
+            print(f"Error creating car listing: {response.error}")
+            return {"message": "Failed to create car listing", "error": response.error}, 400  # Bad Request if there's an error
+
+        # Assuming the successful response contains `data`
+        if hasattr(response, 'data') and response.data:
+            # Return the created car's data (first item in response.data) and a 201 status code (Created)
+            return {"message": "Car listed successfully", "car_id": response.data[0]['id']}, 201
+        
+        # If there is no data, handle unexpected cases
+        return {"message": "Unexpected response structure from Supabase"}, 500  # Internal Server Error
+    
     except Exception as e:
-        print(f"Error creating car: {e}")
-        return {
-            "message": "Error occurred while creating car listing",
-            "error": str(e)
-        }, 500  
+        # Log the error for debugging
+        print(f"Error creating car listing: {e}")
+        return {"message": "An error occurred while creating car listing"}, 500  # Internal Server Error
+
 
 def get_car_by_id(car_id):
     """
