@@ -48,16 +48,16 @@ def create_car(description, price, title, image_url, seller_id, agent_id):
         return {"message": "An error occurred while creating car listing"}, 500  # Internal Server Error
 
 
-def get_car_by_id(car_id):
-    """
-    Fetches a car listing by its ID from the database.
-    """
-    try:
-        response = supabase.table('car_listings').select('*').eq('id', car_id).single().execute()
-        return response.data if response.data else None
-    except Exception as e:
-        print(f"Error fetching car by ID: {e}")
-        return None
+# def get_car_by_id(car_id):
+#     """
+#     Fetches a car listing by its ID from the database.
+#     """
+#     try:
+#         response = supabase.table('car_listings').select('*').eq('id', car_id).single().execute()
+#         return response.data if response.data else None
+#     except Exception as e:
+#         print(f"Error fetching car by ID: {e}")
+#         return None
 
 def update_car_interests(car_id, action):
     """
@@ -107,14 +107,32 @@ def get_car_listings(page, limit):
 
 def get_car_by_id(car_id):
     """
-    Fetches a car listing by its ID.
+    Fetches a car listing by its ID and includes agent details by querying the users table.
     """
     try:
-        response = supabase.table('car_listings').select('*').eq('id', car_id).single().execute()
-        return response.data if response.data else None
+        # Step 1: Fetch the car listing
+        car_response = supabase.table('car_listings').select('*').eq('id', car_id).single().execute()
+        car_data = car_response.data
+
+        if not car_data:
+            return None  # Return None if no car listing is found
+
+        # Step 2: Fetch the agent details using agent_id from the car listing
+        agent_id = car_data.get('agent_id')
+        if agent_id:
+            agent_response = supabase.table('users').select('id, name, email, phone_number').eq('id', agent_id).single().execute()
+            agent_data = agent_response.data
+            if agent_data:
+                car_data['agent_details'] = agent_data  # Add agent details to the car data
+
+        return car_data
+
     except Exception as e:
         print(f"Error fetching car by ID: {e}")
         return None
+
+
+
 
 def update_car(car_id, data):
     """

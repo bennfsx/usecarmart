@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode'; 
+import { jwtDecode } from 'jwt-decode';
 
 const IndividualCarListing = () => {
   const { id } = useParams();
@@ -16,6 +16,8 @@ const IndividualCarListing = () => {
     price: '',
     image_url: '',
   });
+  const [showAgentPopup, setShowAgentPopup] = useState(false); // for showing the agent popup
+  const [agentDetails, setAgentDetails] = useState(null); // for storing agent details
 
   useEffect(() => {
     const fetchCarListing = async () => {
@@ -38,7 +40,13 @@ const IndividualCarListing = () => {
           setIsOwner(listing.seller_id === userId);
           checkIfFavorited(userId, id); 
         }
+
+        // Set the agent details if available
+        if (listing.agent_details) {
+          setAgentDetails(listing.agent_details);
+        }
       } catch (error) {
+        console.error('Error fetching car listing:', error);
       }
     };
   
@@ -48,58 +56,38 @@ const IndividualCarListing = () => {
   const checkIfFavorited = async (userId, carId) => {
     try {
       const response = await axios.get(`http://localhost:8000/favorites?buyer_id=${userId}`);
-  
-      if (Array.isArray(response.data)) {
-        response.data.forEach(favorite => {
-        });
-  
-        // Convert both favorite.listing_id and carId to string for comparison
-        const isFavorited = response.data.some(favorite => {
-          return String(favorite.listing_id) === String(carId); 
-        });
-  
-        setIsFavorited(isFavorited);
-      } else {
-        setIsFavorited(false);
-      }
+      const isFavorited = response.data.some(favorite => String(favorite.listing_id) === String(carId));
+      setIsFavorited(isFavorited);
     } catch (error) {
+      console.error('Error checking favorites:', error);
       setIsFavorited(false);
     }
   };
-  
-  
 
   const handleFavoriteToggle = async () => {
     try {
       const token = localStorage.getItem('token');
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.id;
-  
-  
-      // Toggle favorite status based on the current state
-      if (isFavorited) {
 
+      if (isFavorited) {
         await axios.delete('http://localhost:8000/favorites', {
           headers: { Authorization: `Bearer ${token}` },
-          data: { buyer_id: userId, listing_id: id }, 
+          data: { buyer_id: userId, listing_id: id },
         });
       } else {
-        // Add to favorites
         await axios.post(
           `http://localhost:8000/favorites`,
           { buyer_id: userId, listing_id: id },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
       }
-  
-      // Toggle the favorite status in your state
+
       setIsFavorited(!isFavorited);
     } catch (error) {
+      console.error('Error toggling favorite:', error);
     }
   };
-  
 
   const handleEditToggle = () => setEditable(!editable);
 
@@ -116,12 +104,9 @@ const IndividualCarListing = () => {
       await axios.put(
         `http://localhost:8000/car-listings/${id}`,
         { ...formData, seller_id: sellerId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
+
       setCar({ ...car, ...formData });
       setEditable(false);
       alert('Listing updated successfully!');
@@ -142,10 +127,7 @@ const IndividualCarListing = () => {
       }
 
       const response = await axios.delete(`http://localhost:8000/car-listings/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         data: { seller_id: sellerId },
       });
 
@@ -158,11 +140,46 @@ const IndividualCarListing = () => {
     }
   };
 
+  const navigateToAgentProfile = () => {
+    if (agentDetails && agentDetails.id) {
+      navigate(`/agents/${agentDetails.id}`);
+      setShowAgentPopup(false); // Close the popup after navigating
+    } else {
+      alert('Agent details are not available.');
+    }
+  };
+
   if (!car) return <p>Loading...</p>;
 
   return (
     <div className="container mx-auto p-6">
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        {/* Popup for agent details */}
+        {showAgentPopup && agentDetails && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white p-6 rounded-lg max-w-md w-full">
+              <h2 className="text-xl font-bold">Agent Details</h2>
+              <p><strong>Name:</strong> {agentDetails.name}</p>
+              <p><strong>Email:</strong> {agentDetails.email}</p>
+              <p><strong>Phone:</strong> {agentDetails.phone_number}</p>
+              <div className="mt-4">
+                <button
+                  onClick={navigateToAgentProfile}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-all"
+                >
+                  View Agent Profile
+                </button>
+                <button
+                  onClick={() => setShowAgentPopup(false)}
+                  className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 mt-2 ml-2"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {editable ? (
           <div className="p-6 space-y-4">
             <input
@@ -214,34 +231,44 @@ const IndividualCarListing = () => {
               />
             )}
             <p className="text-sm text-gray-600 mt-2">Views: {car.views}</p>
-            {!isOwner && (
+            {agentDetails && (
               <button
-                onClick={handleFavoriteToggle}
-                className={`mt-4 px-4 py-2 rounded-md transition-all ${
-                  isFavorited ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'
-                }`}
+                onClick={() => setShowAgentPopup(true)}
+                className="mt-4 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-all"
               >
-                {isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
+                View Agent Details
               </button>
             )}
+
             {isOwner && (
-              <div>
+              <div className="mt-4 flex space-x-4">
                 <button
                   onClick={handleEditToggle}
-                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-all"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-all"
                 >
-                  Edit
+                  Edit Listing
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="mt-4 ml-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-all"
+                  className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-all"
                 >
-                  Delete
+                  Delete Listing
                 </button>
               </div>
             )}
           </div>
         )}
+
+        <div className="flex justify-between items-center p-6">
+          <button
+            onClick={handleFavoriteToggle}
+            className={`text-xl font-semibold py-2 px-4 rounded-md ${
+              isFavorited ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-700'
+            }`}
+          >
+            {isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
+          </button>
+        </div>
       </div>
     </div>
   );
